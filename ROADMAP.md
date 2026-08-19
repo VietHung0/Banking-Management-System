@@ -56,20 +56,20 @@
 ```
 > Mẹo: **Controller → Service → Repository → Entity** — của dữ liệu đi vào; từ Entity nếu đọc DB ra.
 
-### Checklist 7 task (làm lần lượt)
+### Checklist task (làm lần lượt)
 | # | Việc | File | Trạng thái |
 |---|---|---|---|
 | 1 | Entity User | `entity/User.java` | ✅ xong |
-| 2 | Repository | `repository/UserRepository.java` | ⬜ |
-| 3 | DTO đăng ký | `dto/UserRegistrationRequest.java` | ⬜ |
-| 4 | Service | `service/UserService*` | ⬜ |
-| 5 | Exception + handler | `exception/*`, `GlobalExceptionHandler` | ⬜ |
-| 6 | Controller | `controller/UserController.java` | ⬜ |
-| 7 | Config Security tối thiểu + chạy thử Postman | `config/WebSecurityConfig` | ⬜ |
+| 2 | Repository | `repository/UserRepository.java` | ✅ xong |
+| 3 | Service (UserService + Impl + SecurityConfig bean PasswordEncoder) | `service/*`, `config/SecurityConfig` | ✅ xong |
+| 4 | Exception + handler | `exception/*`, `GlobalExceptionHandler` | 🔄 đang làm |
+| 5 | Controller | `controller/UserController.java` | ⬜ |
+| 6 | Config Security tối thiểu + chạy thử Postman | `config/WebSecurityConfig` | ⬜ |
 
 ### Điểm cần lưu ý khi làm
-- `User.java` đã viết **KHÔNG có field `Account`** (quan hệ `@OneToOne` sẽ thêm ở Giai đoạn 4) và bỏ 2 import thừa so với bản gốc (`JsonProperty`, `JsonAlias`).
-- Register sẽ mã hóa password bằng **BCrypt** (đưa `PasswordEncoder` bean) — không lưu mật khẩu thô.
+- `User.java` đã viết **KHÔNG có field `Account`** (quan hệ `@OneToOne` sẽ thêm ở Giai đoạn 4) và bỏ 2 import thừa so với bản gốc.
+- Đã chốt: **KHÔNG tạo DTO đăng ký** — bản gốc bỏ luôn `User` vào `@RequestBody` (controller sẽ dùng `@RequestBody User user`).
+- Task 3 đã làm: `registerUser` = kiểm tra trùng email (`findByEmail`.isPresent()) → `passwordEncoder.encode` → `save` → trả về chuỗi. Đơn giản hơn gốc (chưa có ValidationUtil/UserResponse/JsonUtil).
 - Chưa có JWT: `WebSecurityConfig` chỉ cần cho phép `/api/users/register`.
 
 ### Tham chiếu bản gốc

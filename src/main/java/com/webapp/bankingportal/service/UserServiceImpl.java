@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.webapp.bankingportal.entity.User;
+import com.webapp.bankingportal.exception.UserInvalidException;
 import com.webapp.bankingportal.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService {
     // 4. Trả về ResponseEntity.ok("Đăng ký thành công")
     public ResponseEntity<String> registerUser(User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Email đã tồn tại");
+            throw new UserInvalidException("Email đã tồn tại");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
