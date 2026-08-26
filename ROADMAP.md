@@ -12,7 +12,7 @@
 |---|---|---|---|
 | **1** | Scaffold + config Spring Boot | ✅ xong, đã push Git | ~5% |
 | **2** | **User + Đăng ký (Register)** | ✅ xong, đã test chạy thật | ~10% |
-| **3** | Account + PIN (đổi lên trước — login cần accountNumber) | 🔄 đang làm | ~15% |
+| **3** | Account + PIN (đổi lên trước — login cần accountNumber) | ✅ xong, đã test chạy thật | ~15% |
 | **4** | Login + JWT + Security | ⬜ | ~12% |
 | **5** | Gửi / rút tiền / chuyển khoản | ⬜ | ~15% |
 | **6** | Transaction + sao kê email | ⬜ | ~10% |
@@ -86,11 +86,38 @@
 
 ---
 
-## 🔄 Giai đoạn 3 — Account + PIN (đang làm)
+## ✅ Giai đoạn 3 — ĐÃ XONG (Account + PIN)
 
 **Vì sao làm trước:** login bản gốc dùng `user.getAccount().getAccountNumber()` → cần Account trước. Ngoài ra tạo Account ngay sau khi đăng ký là cách bản gốc làm (`saveUserWithAccount`).
 
-Để tôi khảo sát bản gốc để lập checklist cụ thể cho GĐ3.
+### Đã làm
+- `entity/Account.java` — tạo Account entity, quan hệ `User` ↔ `Account`, đổi field `Pin` thành `pin`, thêm default `accountType = "Savings"`, `branch = "NIT"`, `ifscCode = "NIT001"`.
+- `entity/User.java` — thêm quan hệ `@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)` tới Account.
+- `repository/AccountRepository.java` — thêm `findByAccountNumber`.
+- `exception/AccountNotFoundException.java`, `exception/InvalidPinException.java` — thêm exception cho Account/PIN.
+- `controller/GlobalExceptionHandler.java` — thêm handler cho Account/PIN exception.
+- `service/AccountService.java`, `service/AccountServiceImpl.java` — tạo account, check PIN, create PIN, update PIN; password/PIN đều kiểm tra bằng `PasswordEncoder.matches`, PIN lưu BCrypt.
+- `service/UserServiceImpl.java` — register user xong tự tạo account và gắn account vào user.
+- `dto/PinRequest.java`, `dto/PinUpdateRequest.java` — DTO cho create/update PIN.
+- `controller/AccountController.java` — 3 API PIN:
+  - `GET /api/account/pin/check?accountNumber=...`
+  - `POST /api/account/pin/create`
+  - `POST /api/account/pin/update`
+- `config/WebSecurityConfig.java` — mở tạm `/api/account/pin/**` để test trước khi làm JWT.
+- `application.properties` — thêm `allowPublicKeyRetrieval=true` vào MySQL URL để app connect được MySQL local.
+
+### Kết quả đã test thật bằng curl
+- Chạy app bằng `mvnw.cmd clean spring-boot:run` → OK trên `http://localhost:8180`.
+- Register user mới → 200 `"Đăng kí thành công"`.
+- DB sinh account mới, account test nhận được: `766cc7`.
+- `GET /api/account/pin/check?accountNumber=766cc7` trước khi tạo PIN → 200 `"PIN chưa được tạo"`.
+- `POST /api/account/pin/create` với password đúng và PIN `1234` → 200 `"Tạo PIN thành công"`.
+- Check PIN lại → 200 `"PIN đã được tạo"`.
+- `POST /api/account/pin/update` đổi `1234` → `5678` → 200 `"Đổi PIN thành công"`.
+- Tạo PIN lần 2 → 400 `"PIN đã tồn tại"`.
+- Update với old PIN sai → 400 `"PIN không đúng"`.
+
+**NOTE về dữ liệu test:** DB có user test `testpin_20260827_0338@gmail.com` và account `766cc7`.
 
 ---
 

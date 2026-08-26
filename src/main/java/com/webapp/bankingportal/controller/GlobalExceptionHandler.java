@@ -6,6 +6,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.webapp.bankingportal.exception.AccountNotFoundException;
+import com.webapp.bankingportal.exception.InvalidPinException;
 import com.webapp.bankingportal.exception.UserInvalidException;
 
 @ControllerAdvice
@@ -36,5 +38,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleGlobalException(Exception ex) {
         return ResponseEntity.internalServerError().body("Loi server");
 
+    }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<String> handleAccountNotFoundException(AccountNotFoundException ex) {
+        return ResponseEntity.status(404).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidPinException.class)
+    public ResponseEntity<String> handleInvalidPinException(InvalidPinException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }

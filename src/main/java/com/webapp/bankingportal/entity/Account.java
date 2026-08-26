@@ -21,16 +21,33 @@ import lombok.Data;
 @Data
 public class Account {
 
-    // 👇 BẠN VIẾT PHẦN NÀY:
-    // - id: @Id + @GeneratedValue(IDENTITY)
-    // - accountNumber: @NotEmpty + @Column(unique = true)
-    // - accountType: @NotEmpty, default "Savings"
-    // - accountStatus: String (không annotation)
-    // - balance: double
-    // - branch: String, default "NIT"
-    // - ifscCode: String, default "NIT001"
-    // - Pin: String (viết hoa, theo bản gốc)
-    // - user: @NotNull @OneToOne @JoinColumn(name="user_id") private User user;
-    // - tokens: @OneToMany(mappedBy="account", cascade=CascadeType.ALL) private List<Token> tokens = new ArrayList<>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotEmpty
+    @Column(unique = true)
+    private String accountNumber;
+
+    @NotEmpty
+    private String accountType = "Savings";
+
+    private String accountStatus;
+
+    private double balance;
+
+    private String branch = "NIT";
+
+    private String ifscCode = "NIT001";
+
+    private String pin;
+
+    @NotNull
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    private List<Token> tokens = new ArrayList<>();
 
 }

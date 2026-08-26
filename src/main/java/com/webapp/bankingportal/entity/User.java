@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToOne;
 
 import lombok.Data;
 
@@ -38,4 +40,6 @@ public class User {
     @NotEmpty
     private String address;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Account account;
 }

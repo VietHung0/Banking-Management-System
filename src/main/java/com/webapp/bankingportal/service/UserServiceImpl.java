@@ -9,6 +9,7 @@ import com.webapp.bankingportal.exception.UserInvalidException;
 import com.webapp.bankingportal.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import com.webapp.bankingportal.entity.Account;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +18,7 @@ public class UserServiceImpl implements UserService {
     // Lombok tự sinh constructor cho 2 field final này (constructor injection)
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AccountService accountService;
 
     @Override
     // 👇 BẠN VIẾT PHẦN NÀY: registerUser(User user) trả về ResponseEntity<String>
@@ -33,7 +35,10 @@ public class UserServiceImpl implements UserService {
             throw new UserInvalidException("Email đã tồn tại");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        User saveUser = userRepository.save(user);
+        Account account = accountService.createAccount(saveUser);
+        saveUser.setAccount(account);
+        userRepository.save(saveUser);
         return ResponseEntity.ok("Đăng kí thành công");
     }
 }
