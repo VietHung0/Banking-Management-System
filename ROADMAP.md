@@ -11,16 +11,16 @@
 | Giai đoạn | Nội dung | Trạng thái | % tổng |
 |---|---|---|---|
 | **1** | Scaffold + config Spring Boot | ✅ xong, đã push Git | ~5% |
-| **2** | **User + Đăng ký (Register)** | 🔄 đang làm | ~10% |
-| **3** | Login + JWT + Security | ⬜ | ~12% |
-| **4** | Account + PIN | ⬜ | ~15% |
+| **2** | **User + Đăng ký (Register)** | ✅ xong, đã test chạy thật | ~10% |
+| **3** | Account + PIN (đổi lên trước — login cần accountNumber) | 🔄 đang làm | ~15% |
+| **4** | Login + JWT + Security | ⬜ | ~12% |
 | **5** | Gửi / rút tiền / chuyển khoản | ⬜ | ~15% |
 | **6** | Transaction + sao kê email | ⬜ | ~10% |
 | **7** | OTP + reset password | ⬜ | ~10% |
 | **8** | Dashboard + cache (Redis/Caffeine) | ⬜ | ~10% |
 | **9** | Hoàn thiện (CORS, Swagger, util, test) | ⬜ | ~15% |
 
-> **Đã chốt:** JWT được **tách khỏi** Giai đoạn 2 (GĐ2 chỉ register, GĐ3 riêng login + JWT) — để có mốc chạy được sớm và không cắn quá nhiều khái niệm mới một lúc.
+> **Đã chốt (1):** JWT tách khỏi GĐ2. **Đã chốt (2):** đổi thứ tự — **GĐ3 = Account + PIN trước** (login bản gốc dùng `user.getAccount().getAccountNumber()`), **GĐ4 = Login + JWT**.
 
 ---
 
@@ -40,7 +40,7 @@
 
 ---
 
-## 🔄 Giai đoạn 2 — ĐANG LÀM (User + Đăng ký)
+## ✅ Giai đoạn 2 — ĐÃ XONG (User + Đăng ký)
 
 ### Bản đồ kiến trúc (request đi qua đâu)
 ```
@@ -56,35 +56,51 @@
 ```
 > Mẹo: **Controller → Service → Repository → Entity** — của dữ liệu đi vào; từ Entity nếu đọc DB ra.
 
-### Checklist task (làm lần lượt)
+### Checklist task (đã hoàn thành lần lượt)
 | # | Việc | File | Trạng thái |
 |---|---|---|---|
 | 1 | Entity User | `entity/User.java` | ✅ xong |
 | 2 | Repository | `repository/UserRepository.java` | ✅ xong |
 | 3 | Service (UserService + Impl + SecurityConfig bean PasswordEncoder) | `service/*`, `config/SecurityConfig` | ✅ xong |
-| 4 | Exception + handler | `exception/*`, `GlobalExceptionHandler` | 🔄 đang làm |
-| 5 | Controller | `controller/UserController.java` | ⬜ |
-| 6 | Config Security tối thiểu + chạy thử Postman | `config/WebSecurityConfig` | ⬜ |
+| 4 | Exception + handler | `exception/*`, `GlobalExceptionHandler` | ✅ xong |
+| 5 | Controller | `controller/UserController.java` | ✅ xong |
+| 6 | Config Security tối thiểu + chạy thử | `config/WebSecurityConfig` | ✅ xong |
 
-### Điểm cần lưu ý khi làm
-- `User.java` đã viết **KHÔNG có field `Account`** (quan hệ `@OneToOne` sẽ thêm ở Giai đoạn 4) và bỏ 2 import thừa so với bản gốc.
-- Đã chốt: **KHÔNG tạo DTO đăng ký** — bản gốc bỏ luôn `User` vào `@RequestBody` (controller sẽ dùng `@RequestBody User user`).
-- Task 3 đã làm: `registerUser` = kiểm tra trùng email (`findByEmail`.isPresent()) → `passwordEncoder.encode` → `save` → trả về chuỗi. Đơn giản hơn gốc (chưa có ValidationUtil/UserResponse/JsonUtil).
-- Chưa có JWT: `WebSecurityConfig` chỉ cần cho phép `/api/users/register`.
+**Kết quả đã test thật:** chạy app trên `http://localhost:8180`, 3 test API đều đúng:
+- Đăng ký hợp lệ → 200 "Đăng kí thành công"
+- Trùng email → 400 "Email đã tồn tại" (qua `UserInvalidException` + handler)
+- Email sai định dạng → 400 "must be a well-formed email address" (qua `MethodArgumentNotValidException` handler — đã thêm cho `@Valid`)
 
-### Tham chiếu bản gốc
-- `BankingPortal-API/src/main/java/com/webapp/bankingportal/entity/User.java` (đã đọc)
-- `.../repository/UserRepository.java` (đã đọc; 3 method: `findByEmail`, `findByPhoneNumber`, `findByAccountAccountNumber`)
+**Các file đã tạo ở GĐ2 (8 file):**
+- `entity/User.java` — 7 cột, KHÔNG có `account` (thêm ở GĐ4), KHÔNG thêm `@Table` → Hibernate tạo bảng tên `user` (số ít, theo tên class).
+- `repository/UserRepository.java` — `findByEmail`, `findByPhoneNumber`.
+- `config/SecurityConfig.java` — bean `PasswordEncoder` (BCrypt).
+- `service/UserService.java` + `service/UserServiceImpl.java` — `registerUser`: trùng email → throw `UserInvalidException`; `passwordEncoder.encode`; `save`.
+- `exception/UserInvalidException.java` + `controller/GlobalExceptionHandler.java` — 3 handler: UserInvalidException→400, MethodArgumentNotValidException→400, Exception→500.
+- `controller/UserController.java` — `POST /api/users/register` với `@Valid @RequestBody User`.
+- `config/WebSecurityConfig.java` — cho phép `/api/users/register`, chặn mọi thứ khác (403), tắt form-login & http-basic → **API không có trang web; gọi bằng Postman/curl**.
+
+**Mẹo từ test thực tế:** Vào trình duyệt gõ `http://localhost:8180/` bị 403 LÀ ĐÚNG — đây là API, không có trang web. Phải dùng Postman/curl.
+
+**NOTE về dữ liệu:** DB chứa 2 user test (a@gmail.com, f@gmail.com) — khi commit để sạch có thể xóa (`DELETE FROM bankingapp.user;`).
 
 ---
 
-## ⬜ Giai đoạn 3 — Login + JWT (chưa bắt đầu)
+## 🔄 Giai đoạn 3 — Account + PIN (đang làm)
+
+**Vì sao làm trước:** login bản gốc dùng `user.getAccount().getAccountNumber()` → cần Account trước. Ngoài ra tạo Account ngay sau khi đăng ký là cách bản gốc làm (`saveUserWithAccount`).
+
+Để tôi khảo sát bản gốc để lập checklist cụ thể cho GĐ3.
+
+---
+
+## ⬜ Giai đoạn 4 — Login + JWT (chưa bắt đầu)
 `dto/UserLoginRequest` + `UserResponse`, `util/JwtUtil`, `security/JwtAuthenticationFilter` + `JwtAuthenticationEntryPoint`, `service/AuthService*` + `CustomUserDetailsService`, `controller/AuthController`, `WebSecurityConfig` stateless, `PasswordEncoder` bean.
 
 ---
 
-## ⬜ Giai đoạn 4–9 (chưa bắt đầu)
-Giai đoạn 4 → 8 lặp lại **đúng kiến trúc Giai đoạn 2**, chỉ đổi nghiệp vụ (Account/PIN, giao dịch, transaction, OTP, dashboard) — nên càng về sau càng dễ.
+## ⬜ Giai đoạn 5–9 (chưa bắt đầu)
+Giai đoạn 5 → 9 lặp lại **đúng kiến trúc Giai đoạn 2**, chỉ đổi nghiệp vụ (giao dịch, transaction, OTP, dashboard, hoàn thiện) — càng về sau càng dễ.
 
 ---
 
