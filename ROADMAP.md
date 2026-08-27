@@ -13,7 +13,7 @@
 | **1** | Scaffold + config Spring Boot | ✅ xong, đã push Git | ~5% |
 | **2** | **User + Đăng ký (Register)** | ✅ xong, đã test chạy thật | ~10% |
 | **3** | Account + PIN (đổi lên trước — login cần accountNumber) | ✅ xong, đã test chạy thật | ~15% |
-| **4** | Login + JWT + Security | ⬜ | ~12% |
+| **4** | Login + JWT + Security | ✅ xong, đã test chạy thật | ~12% |
 | **5** | Gửi / rút tiền / chuyển khoản | ⬜ | ~15% |
 | **6** | Transaction + sao kê email | ⬜ | ~10% |
 | **7** | OTP + reset password | ⬜ | ~10% |
@@ -121,8 +121,76 @@
 
 ---
 
-## ⬜ Giai đoạn 4 — Login + JWT (chưa bắt đầu)
-`dto/UserLoginRequest` + `UserResponse`, `util/JwtUtil`, `security/JwtAuthenticationFilter` + `JwtAuthenticationEntryPoint`, `service/AuthService*` + `CustomUserDetailsService`, `controller/AuthController`, `WebSecurityConfig` stateless, `PasswordEncoder` bean.
+## ✅ Giai đoạn 4 — ĐÃ XONG (Login + JWT + Security)
+
+**Mục tiêu:** User login bằng `email` hoặc `accountNumber` + password, server trả JWT token. Sau đó các API cần bảo vệ sẽ yêu cầu header `Authorization: Bearer <token>`.
+
+### Cách chia nhỏ để học
+Nên chia GĐ4 thành 2 nửa:
+- **Nửa 1:** Login trả token. ✅ đã xong, đã test bằng curl.
+- **Nửa 2:** Dùng token để bảo vệ API. ✅ đã xong, đã test bằng curl.
+
+### Checklist task
+| # | Việc | File dự kiến | Trạng thái |
+|---|---|---|---|
+| 1 | Thêm dependency JWT | `pom.xml` | ✅ |
+| 2 | Tạo DTO login | `dto/LoginRequest.java` | ✅ |
+| 3 | Thêm query tìm user theo account number | `repository/UserRepository.java` | ✅ |
+| 4 | Tạo JWT helper | `util/JwtUtil.java` | ✅ |
+| 5 | Tạo AuthService interface | `service/AuthService.java` | ✅ |
+| 6 | Tạo AuthServiceImpl, xử lý login | `service/AuthServiceImpl.java` | ✅ |
+| 7 | Tạo AuthController | `controller/AuthController.java` | ✅ |
+| 8 | Test login trả JWT token | curl/Postman | ✅ |
+| 9 | Tạo TokenService theo style project gốc | `service/TokenService.java`, `service/TokenServiceImpl.java` | ✅ |
+| 10 | Tạo JwtAuthenticationFilter | `security/JwtAuthenticationFilter.java` | ✅ |
+| 11 | Sửa WebSecurityConfig sang JWT/stateless | `config/WebSecurityConfig.java` | ✅ |
+| 12 | Khóa lại `/api/account/**`, chỉ mở register/login | `config/WebSecurityConfig.java` | ✅ |
+| 13 | Test API không token bị chặn, có token thì chạy | curl | ✅ |
+
+### Luồng login cần hiểu
+```
+Client gửi identifier + password
+   ↓
+AuthController nhận request
+   ↓
+AuthService tìm user bằng email hoặc accountNumber
+   ↓
+PasswordEncoder.matches(rawPassword, encodedPassword)
+   ↓
+Lấy accountNumber từ user.getAccount().getAccountNumber()
+   ↓
+JwtUtil.generateToken(accountNumber)
+   ↓
+Trả token về client
+```
+
+### Luồng request có JWT
+```
+Client gửi Authorization: Bearer <token>
+   ↓
+JwtAuthenticationFilter đọc token
+   ↓
+JwtUtil extract accountNumber
+   ↓
+TokenService load user theo accountNumber
+   ↓
+Set Authentication vào SecurityContext
+   ↓
+Controller được chạy nếu token hợp lệ
+```
+
+### Đã test ở GĐ4
+- `POST /api/auth/login` bằng email `testpin_20260827_0338@gmail.com` + password `123456` → 200, trả JWT.
+- `POST /api/auth/login` bằng accountNumber `766cc7` + password `123456` → 200, trả JWT.
+- `JwtUtil` đã sửa sang `Keys.hmacShaKeyFor(...)`, `signWith(getSigningKey(), SignatureAlgorithm.HS256)`, `parserBuilder()`.
+- Spring log nhận `tokenServiceImpl` làm `UserDetailsService`.
+- `GET /api/account/pin/check?accountNumber=766cc7` không token → 403.
+- `GET /api/account/pin/check?accountNumber=766cc7` có `Authorization: Bearer <jwt>` → 200 `"PIN đã được tạo"`.
+- `config/WebSecurityConfig.java` đã chuyển sang stateless JWT và chỉ permit:
+  - `/api/users/register`
+  - `/api/auth/login`
+
+**NOTE:** Project mới đi theo style project gốc: không dùng `CustomUserDetailsService`; thay vào đó `TokenService extends UserDetailsService`, `TokenServiceImpl` implement `loadUserByUsername(accountNumber)`.
 
 ---
 
