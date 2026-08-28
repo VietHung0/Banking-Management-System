@@ -14,7 +14,7 @@
 | **2** | **User + Đăng ký (Register)** | ✅ xong, đã test chạy thật | ~10% |
 | **3** | Account + PIN (đổi lên trước — login cần accountNumber) | ✅ xong, đã test chạy thật | ~15% |
 | **4** | Login + JWT + Security | ✅ xong, đã test chạy thật | ~12% |
-| **5** | Gửi / rút tiền / chuyển khoản | ⬜ | ~15% |
+| **5** | Gửi / rút tiền / chuyển khoản | ✅ xong, đã test chạy thật | ~15% |
 | **6** | Transaction + sao kê email | ⬜ | ~10% |
 | **7** | OTP + reset password | ⬜ | ~10% |
 | **8** | Dashboard + cache (Redis/Caffeine) | ⬜ | ~10% |
@@ -194,8 +194,96 @@ Controller được chạy nếu token hợp lệ
 
 ---
 
-## ⬜ Giai đoạn 5–9 (chưa bắt đầu)
-Giai đoạn 5 → 9 lặp lại **đúng kiến trúc Giai đoạn 2**, chỉ đổi nghiệp vụ (giao dịch, transaction, OTP, dashboard, hoàn thiện) — càng về sau càng dễ.
+## ✅ Giai đoạn 5 — ĐÃ XONG (Gửi tiền / rút tiền / chuyển khoản)
+
+**Mục tiêu:** Account có thể thay đổi `balance` qua 3 nghiệp vụ chính:
+- Deposit: nạp/gửi tiền vào tài khoản.
+- Withdraw: rút tiền khỏi tài khoản.
+- Transfer: chuyển tiền từ tài khoản này sang tài khoản khác.
+
+### Checklist task
+| # | Việc | File dự kiến | Trạng thái |
+|---|---|---|---|
+| 1 | Đối chiếu project gốc để xem DTO/endpoint/logic tiền | `BankingPortal-API` | ✅ |
+| 2 | Tạo DTO gửi/rút tiền | `dto/AmountRequest.java` | ✅ |
+| 3 | Tạo DTO chuyển khoản | `dto/FundTransferRequest.java` | ✅ |
+| 4 | Tạo util lấy account đang login từ JWT | `util/LoggedinUser.java` | ✅ |
+| 5 | Thêm method service cho 3 nghiệp vụ | `service/AccountService.java` | ✅ |
+| 6 | Viết logic deposit | `service/AccountServiceImpl.java` | ✅ |
+| 7 | Viết logic withdraw: check account, check PIN, check đủ tiền | `service/AccountServiceImpl.java` | ✅ |
+| 8 | Viết logic transfer: check sender/receiver, check PIN, check đủ tiền, trừ/cộng balance | `service/AccountServiceImpl.java` | ✅ |
+| 9 | Thêm API deposit/withdraw/transfer | `controller/AccountController.java` | ✅ |
+| 10 | Test không có JWT bị chặn | curl | ✅ |
+| 11 | Test có JWT: deposit đúng, withdraw đúng, transfer đúng | curl | ✅ |
+| 12 | Test case lỗi: sai PIN, không đủ tiền, account không tồn tại | curl | ✅ |
+| 13 | Note kết quả test vào roadmap | `ROADMAP.md` | ✅ |
+
+### Luồng deposit
+```
+Client gửi JWT + accountNumber + amount
+   ↓
+AccountController
+   ↓
+AccountServiceImpl tìm account
+   ↓
+Cộng amount vào balance
+   ↓
+Save account
+```
+
+### Luồng withdraw
+```
+Client gửi JWT + accountNumber + pin + amount
+   ↓
+AccountController
+   ↓
+AccountServiceImpl tìm account
+   ↓
+Check PIN bằng PasswordEncoder.matches
+   ↓
+Check balance đủ tiền
+   ↓
+Trừ amount khỏi balance
+   ↓
+Save account
+```
+
+### Luồng transfer
+```
+Client gửi JWT + fromAccountNumber + toAccountNumber + pin + amount
+   ↓
+AccountController
+   ↓
+AccountServiceImpl tìm account gửi và account nhận
+   ↓
+Check PIN của account gửi
+   ↓
+Check account gửi đủ tiền
+   ↓
+Trừ balance account gửi, cộng balance account nhận
+   ↓
+Save cả 2 account
+```
+
+**NOTE:** GĐ5 vẫn dùng JWT Security từ GĐ4. Các API `/api/account/**` hiện đã bị khóa, nên khi test phải gửi header `Authorization: Bearer <jwt>`.
+
+### Kết quả đã test ở GĐ5
+- Register thêm user nhận tiền `transfer_target_20260828@gmail.com` → account nhận `dd3d2f`.
+- Login user nguồn `testpin_20260827_0338@gmail.com` → lấy JWT cho account `766cc7`.
+- `POST /api/account/deposit` không JWT → 403.
+- `POST /api/account/deposit` có JWT, PIN `5678`, amount `1000000` → 200 `"Gửi tiền thành công"`.
+- `POST /api/account/withdraw` có JWT, PIN `5678`, amount `200000` → 200 `"Rút tiền thành công"`.
+- `POST /api/account/fund-transfer` có JWT, chuyển `300000` từ `766cc7` sang `dd3d2f` → 200 `"Chuyển tiền thành công"`.
+- Sai PIN → 400 `"PIN không đúng"`.
+- Account nhận không tồn tại → 404 `"Không tìm thấy tài khoản nhận"`.
+- Rút quá số dư → 400 `"Số dư không đủ"`.
+- Giao dịch vượt `10000000` → 400 `"Số tiền không được vượt quá 10000000"`.
+- Balance sau test: account `766cc7` còn `500000`, account `dd3d2f` có `300000`.
+
+---
+
+## ⬜ Giai đoạn 6–9 (chưa bắt đầu)
+Giai đoạn 6 → 9 lặp lại **đúng kiến trúc Giai đoạn 2**, chỉ đổi nghiệp vụ (transaction, OTP, dashboard, hoàn thiện).
 
 ---
 

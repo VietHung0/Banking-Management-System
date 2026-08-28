@@ -2,6 +2,7 @@ package com.webapp.bankingportal.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.webapp.bankingportal.repository.AccountRepository;
 
@@ -117,6 +118,74 @@ public class AccountServiceImpl implements AccountService {
 
         account.setPin(passwordEncoder.encode(newPin));
         accountRepository.save(account);
+    }
+
+    private void validateAmount(double amount) {
+        if (amount <= 0) {
+            throw new UserInvalidException("Số tiền phải lớn hơn 0");
+        }
+        if (amount % 100 != 0) {
+            throw new UserInvalidException("Số tiền phải là bội số của 100");
+        }
+        if (amount > 10000000) {
+            throw new UserInvalidException("Số tiền không được vượt quá 10000000");
+        }
+    }
+
+    @Transactional
+    @Override
+    public void cashDeposit(String accountNumber, String pin, double amount) {
+        validatePin(accountNumber, pin);
+        validateAmount(amount);
+        Account account = accountRepository.findByAccountNumber(accountNumber);
+        double currentBalance = account.getBalance();
+        double newBalance = currentBalance + amount;
+        account.setBalance(newBalance);
+        accountRepository.save(account);
+    }
+
+    @Transactional
+    @Override
+    public void cashWithdrawal(String accountNumber, String pin, double amount) {
+        validatePin(accountNumber, pin);
+        validateAmount(amount);
+
+        Account account = accountRepository.findByAccountNumber(accountNumber);
+        double currentBalance = account.getBalance();
+        if (currentBalance < amount) {
+            throw new UserInvalidException("Số dư không đủ");
+        }
+        double newBalance = currentBalance - amount;
+        account.setBalance(newBalance);
+        accountRepository.save(account);
+    }
+
+    @Transactional
+    @Override
+    public void fundTransfer(String sourceAccountNumber, String targetAccountNumber, String pin, double amount) {
+        validatePin(sourceAccountNumber, pin);
+        validateAmount(amount);
+
+        if (sourceAccountNumber.equals(targetAccountNumber)) {
+            throw new UserInvalidException("Không thể chuyển tiền cho chính tài khoản của mình");
+        }
+
+        Account sourceAccount = accountRepository.findByAccountNumber(sourceAccountNumber);
+        Account targetAccount = accountRepository.findByAccountNumber(targetAccountNumber);
+
+        if (targetAccount == null) {
+            throw new AccountNotFoundException("Không tìm thấy tài khoản nhận");
+        }
+        double sourceBalance = sourceAccount.getBalance();
+
+        if (sourceBalance < amount) {
+            throw new UserInvalidException("Số dư không đủ");
+        }
+        sourceAccount.setBalance(sourceBalance - amount);
+        targetAccount.setBalance(targetAccount.getBalance() + amount);
+
+        accountRepository.save(sourceAccount);
+        accountRepository.save(targetAccount);
     }
 
 }

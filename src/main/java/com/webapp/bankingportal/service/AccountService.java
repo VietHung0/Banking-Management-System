@@ -13,5 +13,9 @@ public interface AccountService {
 
     void updatePin(String accountNumber, String oldPin, String password, String newPin);
 
+    void cashDeposit(String accountNumber, String pin, double amount);
 
+    void cashWithdrawal(String accountNumber, String pin, double amount);
+
+    void fundTransfer(String sourceAccountNumber, String targetAccountNumber, String pin, double amount);
 }

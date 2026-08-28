@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.webapp.bankingportal.dto.PinRequest;
 import com.webapp.bankingportal.dto.PinUpdateRequest;
+import com.webapp.bankingportal.dto.AmountRequest;
+import com.webapp.bankingportal.dto.FundTransferRequest;
+import com.webapp.bankingportal.util.LoggedinUser;
 
 @RestController
 @RequestMapping("/api/account")
@@ -49,5 +52,33 @@ public class AccountController {
                 pinUpdateRequest.password(),
                 pinUpdateRequest.newPin());
         return ResponseEntity.ok("Đổi PIN thành công");
+    }
+
+    @PostMapping("/deposit")
+    public ResponseEntity<String> cashDeposit(@RequestBody AmountRequest amountRequest) {
+        accountService.cashDeposit(
+                LoggedinUser.getAccountNumber(),
+                amountRequest.pin(),
+                amountRequest.amount());
+        return ResponseEntity.ok("Gửi tiền thành công");
+    }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity<String> cashWithdrawal(@RequestBody AmountRequest amountRequest) {
+        accountService.cashWithdrawal(
+                LoggedinUser.getAccountNumber(),
+                amountRequest.pin(),
+                amountRequest.amount());
+        return ResponseEntity.ok("Rút tiền thành công");
+    }
+
+    @PostMapping("/fund-transfer")
+    public ResponseEntity<String> fundTransfer(@RequestBody FundTransferRequest fundTransferRequest) {
+        accountService.fundTransfer(
+                LoggedinUser.getAccountNumber(),
+                fundTransferRequest.targetAccountNumber(),
+                fundTransferRequest.pin(),
+                fundTransferRequest.amount());
+        return ResponseEntity.ok("Chuyển tiền thành công");
     }
 }
