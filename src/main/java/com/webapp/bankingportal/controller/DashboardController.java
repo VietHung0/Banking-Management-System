@@ -18,11 +18,13 @@ public class DashboardController {
 
     @GetMapping("/user")
     public ResponseEntity<?> getUserDetails() {
-        return null;
+        return ResponseEntity.ok(dashboardService.getUserDetails(LoggedinUser.getAccountNumber()));
     }
 
     @GetMapping("/account")
     public ResponseEntity<?> getAccountDetails() {
-        return null;
+        return ResponseEntity.ok(
+                dashboardService.getAccountDetails(
+                        LoggedinUser.getAccountNumber()));
     }
 }
