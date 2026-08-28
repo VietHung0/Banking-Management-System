@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.webapp.bankingportal.dto.LoginRequest;
+import com.webapp.bankingportal.dto.LoginResponse;
 import com.webapp.bankingportal.repository.UserRepository;
 import com.webapp.bankingportal.util.JwtUtil;
 
@@ -22,7 +23,7 @@ public class AuthServiceImpl implements AuthService {
 
     // tu tao constructor cho cac bien final
     @Override
-    public ResponseEntity<String> login(LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
         User user;
         // identifier la mail hoac accountNumber
         if (loginRequest.identifier().contains("@")) {
@@ -38,6 +39,6 @@ public class AuthServiceImpl implements AuthService {
 
         String accountNumber = user.getAccount().getAccountNumber();
         String token = jwtUtil.generateToken(accountNumber);
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(new LoginResponse(token));
     }
 }

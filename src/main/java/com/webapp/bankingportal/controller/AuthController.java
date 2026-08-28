@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.webapp.bankingportal.dto.LoginRequest;
+import com.webapp.bankingportal.dto.LoginResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,7 +20,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
 

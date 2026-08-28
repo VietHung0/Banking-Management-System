@@ -9,7 +9,6 @@ import com.webapp.bankingportal.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -28,8 +27,8 @@ public class AccountController {
     private final TransactionService transactionService;
 
     @GetMapping("/pin/check")
-    public ResponseEntity<String> checkPin(@RequestParam String accountNumber) {
-        boolean isPinCreated = accountService.isPinCreated(accountNumber);
+    public ResponseEntity<String> checkPin() {
+        boolean isPinCreated = accountService.isPinCreated(LoggedinUser.getAccountNumber());
 
         if (isPinCreated) {
             return ResponseEntity.ok("PIN đã được tạo");
@@ -40,7 +39,7 @@ public class AccountController {
     @PostMapping("/pin/create")
     public ResponseEntity<String> createPin(@RequestBody PinRequest pinRequest) {
         accountService.createPin(
-                pinRequest.accountNumber(),
+                LoggedinUser.getAccountNumber(),
                 pinRequest.password(),
                 pinRequest.pin());
         return ResponseEntity.ok("Tạo PIN thành công");
@@ -49,7 +48,7 @@ public class AccountController {
     @PostMapping("/pin/update")
     public ResponseEntity<String> updatePin(@RequestBody PinUpdateRequest pinUpdateRequest) {
         accountService.updatePin(
-                pinUpdateRequest.accountNumber(),
+                LoggedinUser.getAccountNumber(),
                 pinUpdateRequest.oldPin(),
                 pinUpdateRequest.password(),
                 pinUpdateRequest.newPin());
