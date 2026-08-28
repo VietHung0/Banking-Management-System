@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.webapp.bankingportal.repository.AccountRepository;
+import com.webapp.bankingportal.repository.TransactionRepository;
 
 import lombok.RequiredArgsConstructor;
 import java.util.UUID;
@@ -14,6 +15,9 @@ import com.webapp.bankingportal.entity.User;
 import com.webapp.bankingportal.exception.AccountNotFoundException;
 import com.webapp.bankingportal.exception.UserInvalidException;
 import com.webapp.bankingportal.exception.InvalidPinException;
+import java.util.Date;
+import com.webapp.bankingportal.entity.Transaction;
+import com.webapp.bankingportal.entity.TransactionType;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +25,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TransactionRepository transactionRepository;
 
     @Override
     public Account createAccount(User user) {
@@ -142,6 +147,14 @@ public class AccountServiceImpl implements AccountService {
         double newBalance = currentBalance + amount;
         account.setBalance(newBalance);
         accountRepository.save(account);
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TransactionType.CASH_DEPOSIT);
+        transaction.setTransactionDate(new Date());
+        transaction.setSourceAccount(account);
+
+        transactionRepository.save(transaction);
     }
 
     @Transactional
@@ -158,6 +171,14 @@ public class AccountServiceImpl implements AccountService {
         double newBalance = currentBalance - amount;
         account.setBalance(newBalance);
         accountRepository.save(account);
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TransactionType.CASH_WITHDRAWAL);
+        transaction.setTransactionDate(new Date());
+        transaction.setSourceAccount(account);
+
+        transactionRepository.save(transaction);
     }
 
     @Transactional
@@ -186,6 +207,14 @@ public class AccountServiceImpl implements AccountService {
 
         accountRepository.save(sourceAccount);
         accountRepository.save(targetAccount);
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setTransactionType(TransactionType.CASH_TRANSFER);
+        transaction.setTransactionDate(new Date());
+        transaction.setSourceAccount(sourceAccount);
+        transaction.setTargetAccount(targetAccount);
+        transactionRepository.save(transaction);
     }
 
 }

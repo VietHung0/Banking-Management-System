@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.webapp.bankingportal.service.AccountService;
+import com.webapp.bankingportal.service.TransactionService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ import com.webapp.bankingportal.util.LoggedinUser;
 public class AccountController {
 
     private final AccountService accountService;
+    private final TransactionService transactionService;
 
     @GetMapping("/pin/check")
     public ResponseEntity<String> checkPin(@RequestParam String accountNumber) {
@@ -80,5 +82,12 @@ public class AccountController {
                 fundTransferRequest.pin(),
                 fundTransferRequest.amount());
         return ResponseEntity.ok("Chuyển tiền thành công");
+    }
+
+    @GetMapping("/transactions")
+    public ResponseEntity<?> getAllTransactionByAccountNumber() {
+        return ResponseEntity.ok(
+                transactionService.getAllTransactionsByAccountNumber(
+                        LoggedinUser.getAccountNumber()));
     }
 }

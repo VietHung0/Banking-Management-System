@@ -282,8 +282,89 @@ Save cả 2 account
 
 ---
 
-## ⬜ Giai đoạn 6–9 (chưa bắt đầu)
-Giai đoạn 6 → 9 lặp lại **đúng kiến trúc Giai đoạn 2**, chỉ đổi nghiệp vụ (transaction, OTP, dashboard, hoàn thiện).
+## ⬜ Giai đoạn 6 — Transaction history + sao kê email
+
+**Mục tiêu:** Mỗi lần deposit/withdraw/transfer thành công thì hệ thống phải lưu lại lịch sử giao dịch. Sau đó user có thể xem lịch sử giao dịch và gửi sao kê về email.
+
+### Checklist task
+| # | Việc | File dự kiến | Trạng thái |
+|---|---|---|---|
+| 1 | Đối chiếu project gốc để xem Transaction entity/service/controller | `BankingPortal-API` | ✅ |
+| 2 | Tạo enum loại giao dịch | `entity/TransactionType.java` | ✅ |
+| 3 | Tạo Transaction entity | `entity/Transaction.java` | ✅ |
+| 4 | Tạo Transaction DTO response | `dto/TransactionDTO.java` | ✅ |
+| 5 | Tạo TransactionRepository | `repository/TransactionRepository.java` | ✅ |
+| 6 | Tạo TransactionService interface | `service/TransactionService.java` | ✅ |
+| 7 | Tạo TransactionServiceImpl skeleton/import | `service/TransactionServiceImpl.java` | ✅ |
+| 8 | Viết logic lấy transaction theo accountNumber | `service/TransactionServiceImpl.java` | ✅ |
+| 9 | Inject TransactionRepository vào AccountServiceImpl | `service/AccountServiceImpl.java` | ✅ |
+| 10 | Sau deposit thành công thì save Transaction | `service/AccountServiceImpl.java` | ✅ |
+| 11 | Sau withdraw thành công thì save Transaction | `service/AccountServiceImpl.java` | ✅ |
+| 12 | Sau transfer thành công thì save Transaction | `service/AccountServiceImpl.java` | ✅ |
+| 13 | Thêm API xem lịch sử giao dịch | `controller/AccountController.java` | ✅ |
+| 14 | Test deposit/withdraw/transfer sinh transaction đúng | curl + DB | ✅ |
+| 15 | Test API xem transaction history bằng JWT | curl | ✅ |
+| 16 | Thêm dependency/config gửi email nếu làm sao kê | `pom.xml`, `application.properties` | ⬜ |
+| 17 | Viết logic gửi sao kê email | `service/TransactionServiceImpl.java` | ⬜ |
+| 18 | Thêm API gửi sao kê email | `controller/AccountController.java` | ⬜ |
+| 19 | Test gửi sao kê email | curl/email inbox | ⬜ |
+| 20 | Note kết quả test vào roadmap | `ROADMAP.md` | ⬜ |
+
+### Luồng lưu transaction
+```
+Client gọi deposit/withdraw/transfer có JWT
+   ↓
+AccountController lấy accountNumber từ LoggedinUser
+   ↓
+AccountServiceImpl xử lý balance
+   ↓
+Nếu nghiệp vụ thành công thì tạo Transaction
+   ↓
+TransactionRepository.save(transaction)
+```
+
+### Luồng xem lịch sử giao dịch
+```
+Client gọi GET /api/account/transactions có JWT
+   ↓
+AccountController lấy accountNumber từ LoggedinUser
+   ↓
+TransactionServiceImpl tìm transaction liên quan accountNumber
+   ↓
+Trả danh sách TransactionDTO
+```
+
+### Luồng gửi sao kê email
+```
+Client gọi GET /api/account/send-statement có JWT
+   ↓
+AccountController lấy accountNumber từ LoggedinUser
+   ↓
+TransactionServiceImpl lấy user email + danh sách transaction
+   ↓
+Format nội dung sao kê
+   ↓
+Gửi email
+```
+
+**NOTE phỏng vấn backend:** Nếu thời gian gấp, ưu tiên xong chắc task 1–15 trước. Email sao kê là điểm cộng, nhưng transaction history mới là phần quan trọng nhất.
+
+### Kết quả đã test phần Transaction History
+- App start OK, Hibernate tạo bảng `transaction` với 2 khóa ngoại `source_account_id`, `target_account_id`.
+- Login account `766cc7` lấy JWT → OK.
+- Deposit `100000` → 200 `"Gửi tiền thành công"` và sinh transaction `CASH_DEPOSIT`.
+- Withdraw `100000` → 200 `"Rút tiền thành công"` và sinh transaction `CASH_WITHDRAWAL`.
+- Transfer `100000` từ `766cc7` sang `dd3d2f` → 200 `"Chuyển tiền thành công"` và sinh transaction `CASH_TRANSFER`.
+- DB kiểm tra được 3 dòng transaction mới:
+  - `CASH_DEPOSIT`: source `766cc7`, target `NULL`
+  - `CASH_WITHDRAWAL`: source `766cc7`, target `NULL`
+  - `CASH_TRANSFER`: source `766cc7`, target `dd3d2f`
+- `GET /api/account/transactions` có JWT → 200, trả list `TransactionDTO` đúng.
+
+---
+
+## ⬜ Giai đoạn 7–9 (chưa bắt đầu)
+Giai đoạn 7 → 9 lặp lại **đúng kiến trúc Giai đoạn 2**, chỉ đổi nghiệp vụ (OTP, dashboard, hoàn thiện).
 
 ---
 
