@@ -1,0 +1,75 @@
+<section class="page-header">
+  <div>
+    <h1>Dashboard</h1>
+    <p>Tổng quan tài khoản ngân hàng</p>
+  </div>
+</section>
+
+<p class="status" *ngIf="isLoading">Đang tải dữ liệu...</p>
+<p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+<section class="summary-grid" *ngIf="!isLoading && !errorMessage">
+  <article class="summary-card">
+    <span class="label">Số dư</span>
+    <strong>{{ account?.balance }}</strong>
+    <span class="meta">Account {{ account?.accountNumber }}</span>
+  </article>
+
+  <article class="summary-card">
+    <span class="label">Loại tài khoản</span>
+    <strong>{{ account?.accountType }}</strong>
+    <span class="meta">{{ account?.branch }} - {{ account?.ifscCode }}</span>
+  </article>
+
+  <article class="summary-card">
+    <span class="label">Trạng thái</span>
+    <strong>{{ account?.accountStatus }}</strong>
+    <span class="meta">Chủ tài khoản {{ user?.name }}</span>
+  </article>
+</section>
+
+<section class="detail-grid" *ngIf="!isLoading && !errorMessage">
+  <article>
+    <h2>Thông tin user</h2>
+    <dl>
+      <div>
+        <dt>Họ tên</dt>
+        <dd>{{ user?.name }}</dd>
+      </div>
+      <div>
+        <dt>Email</dt>
+        <dd>{{ user?.email }}</dd>
+      </div>
+      <div>
+        <dt>Số điện thoại</dt>
+        <dd>{{ user?.countryCode }} {{ user?.phoneNumber }}</dd>
+      </div>
+      <div>
+        <dt>Địa chỉ</dt>
+        <dd>{{ user?.address }}</dd>
+      </div>
+    </dl>
+  </article>
+
+  <article>
+    <h2>Thông tin account</h2>
+    <dl>
+      <div>
+        <dt>Số tài khoản</dt>
+        <dd>{{ account?.accountNumber }}</dd>
+      </div>
+      <div>
+        <dt>IFSC</dt>
+        <dd>{{ account?.ifscCode }}</dd>
+      </div>
+      <div>
+        <dt>Chi nhánh</dt>
+        <dd>{{ account?.branch }}</dd>
+      </div>
+      <div>
+        <dt>Loại tài khoản</dt>
+        <dd>{{ account?.accountType }}</dd>
+      </div>
+    </dl>
+  </article>
+</section>

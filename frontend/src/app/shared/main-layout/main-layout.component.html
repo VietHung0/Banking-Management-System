@@ -1,0 +1,23 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">B</span>
+      <span>Banking Management</span>
+    </div>
+
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/account/pin" routerLinkActive="active">PIN</a>
+      <a routerLink="/account/deposit" routerLinkActive="active">Deposit</a>
+      <a routerLink="/account/withdraw" routerLinkActive="active">Withdraw</a>
+      <a routerLink="/account/fund-transfer" routerLinkActive="active">Transfer</a>
+      <a routerLink="/account/transactions" routerLinkActive="active">Transactions</a>
+    </nav>
+
+    <button type="button" (click)="logout()">Logout</button>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

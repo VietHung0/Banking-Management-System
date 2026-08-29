@@ -1,0 +1,87 @@
+.page-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+h1,
+p {
+  margin: 0;
+}
+
+h1 {
+  color: #162033;
+  font-size: 28px;
+}
+
+p {
+  color: #64748b;
+  margin-top: 6px;
+}
+
+button {
+  background: #14532d;
+  border: 0;
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  min-height: 40px;
+  padding: 0 16px;
+}
+
+.table-card,
+.status,
+.error-message {
+  background: #ffffff;
+  border: 1px solid #dde4ef;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.error-message {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.empty-state {
+  margin: 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  border-bottom: 1px solid #eef2f7;
+  color: #334155;
+  padding: 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  color: #64748b;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+@media (max-width: 860px) {
+  .table-card {
+    overflow-x: auto;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    display: grid;
+    gap: 14px;
+  }
+}

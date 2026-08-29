@@ -1,0 +1,54 @@
+<section class="page-header">
+  <div>
+    <h1>PIN</h1>
+    <p>Tạo hoặc đổi PIN cho tài khoản đang đăng nhập</p>
+  </div>
+</section>
+
+<p class="success-message" *ngIf="statusMessage">{{ statusMessage }}</p>
+<p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+<section class="form-grid">
+  <article>
+    <h2>Tạo PIN</h2>
+    <form (ngSubmit)="createPin()">
+      <label>
+        PIN mới
+        <input type="password" name="createPin" [(ngModel)]="createPinRequest.pin" required>
+      </label>
+
+      <label>
+        Mật khẩu đăng nhập
+        <input type="password" name="createPassword" [(ngModel)]="createPinRequest.password" required>
+      </label>
+
+      <button type="submit" [disabled]="isLoading || hasPin">
+        {{ isLoading ? 'Đang xử lý...' : 'Tạo PIN' }}
+      </button>
+    </form>
+  </article>
+
+  <article>
+    <h2>Đổi PIN</h2>
+    <form (ngSubmit)="updatePin()">
+      <label>
+        PIN cũ
+        <input type="password" name="oldPin" [(ngModel)]="updatePinRequest.oldPin" required>
+      </label>
+
+      <label>
+        PIN mới
+        <input type="password" name="newPin" [(ngModel)]="updatePinRequest.newPin" required>
+      </label>
+
+      <label>
+        Mật khẩu đăng nhập
+        <input type="password" name="updatePassword" [(ngModel)]="updatePinRequest.password" required>
+      </label>
+
+      <button type="submit" [disabled]="isLoading || !hasPin">
+        {{ isLoading ? 'Đang xử lý...' : 'Đổi PIN' }}
+      </button>
+    </form>
+  </article>
+</section>

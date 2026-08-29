@@ -1,0 +1,49 @@
+<section class="page-header">
+  <div>
+    <h1>Transfer</h1>
+    <p>Chuyển tiền sang tài khoản khác</p>
+  </div>
+</section>
+
+<article class="form-card">
+  <form (ngSubmit)="onSubmit()">
+    <label>
+      Số tài khoản nhận
+      <input
+        type="text"
+        name="targetAccountNumber"
+        [(ngModel)]="transferRequest.targetAccountNumber"
+        required
+      >
+    </label>
+
+    <label>
+      Số tiền
+      <input
+        type="number"
+        name="amount"
+        min="1"
+        max="10000000"
+        [(ngModel)]="transferRequest.amount"
+        required
+      >
+    </label>
+
+    <label>
+      PIN
+      <input
+        type="password"
+        name="pin"
+        [(ngModel)]="transferRequest.pin"
+        required
+      >
+    </label>
+
+    <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
+    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <button type="submit" [disabled]="isLoading">
+      {{ isLoading ? 'Đang xử lý...' : 'Chuyển khoản' }}
+    </button>
+  </form>
+</article>

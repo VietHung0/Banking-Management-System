@@ -1,0 +1,38 @@
+<section class="page-header">
+  <div>
+    <h1>Transactions</h1>
+    <p>Lịch sử giao dịch của tài khoản đang đăng nhập</p>
+  </div>
+
+  <button type="button" (click)="loadTransactions()">Refresh</button>
+</section>
+
+<p class="status" *ngIf="isLoading">Đang tải giao dịch...</p>
+<p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+<section class="table-card" *ngIf="!isLoading && !errorMessage">
+  <p class="empty-state" *ngIf="transactions.length === 0">Chưa có giao dịch nào.</p>
+
+  <table *ngIf="transactions.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Loại</th>
+        <th>Số tiền</th>
+        <th>Nguồn</th>
+        <th>Đích</th>
+        <th>Thời gian</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let transaction of transactions">
+        <td>{{ transaction.id }}</td>
+        <td>{{ transaction.transactionType }}</td>
+        <td>{{ transaction.amount }}</td>
+        <td>{{ transaction.sourceAccountNumber }}</td>
+        <td>{{ transaction.targetAccountNumber }}</td>
+        <td>{{ transaction.transactionDate | date: 'short' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
