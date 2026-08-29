@@ -368,6 +368,56 @@ Giai đoạn 7 → 9 lặp lại **đúng kiến trúc Giai đoạn 2**, chỉ �
 
 ---
 
+## 🔄 Frontend — Angular trong Banking-Management-System
+
+**Mục tiêu:** Tự làm lại frontend Angular trong cùng project `Banking-Management-System/frontend`, dùng `BankingPortal-UI` chỉ để tham khảo giao diện/luồng. Không sửa project gốc `BankingPortal-UI`.
+
+### Quy ước làm từng feature
+Mỗi feature sẽ đi theo thứ tự:
+```
+Route -> Component -> DTO/interface -> Service gọi API -> Logic trong component -> Test trên trình duyệt
+```
+
+### 11 API backend sẽ dùng cho frontend
+| # | Feature | API backend | Mục đích | Trạng thái frontend |
+|---|---|---|---|---|
+| 1 | Register | `POST /api/users/register` | Đăng ký user + tự tạo account | ⬜ |
+| 2 | Login | `POST /api/users/login` | Đăng nhập, nhận JWT | ⬜ |
+| 3 | Dashboard user | `GET /api/dashboard/user` | Lấy thông tin user đang login | ⬜ |
+| 4 | Dashboard account | `GET /api/dashboard/account` | Lấy thông tin account/số dư | ⬜ |
+| 5 | Check PIN | `GET /api/account/pin/check` | Kiểm tra account đã có PIN chưa | ⬜ |
+| 6 | Create PIN | `POST /api/account/pin/create` | Tạo PIN lần đầu | ⬜ |
+| 7 | Update PIN | `POST /api/account/pin/update` | Đổi PIN | ⬜ |
+| 8 | Deposit | `POST /api/account/deposit` | Nạp/gửi tiền | ⬜ |
+| 9 | Withdraw | `POST /api/account/withdraw` | Rút tiền | ⬜ |
+| 10 | Transfer | `POST /api/account/fund-transfer` | Chuyển khoản | ⬜ |
+| 11 | Transaction history | `GET /api/account/transactions` | Xem lịch sử giao dịch | ⬜ |
+
+### Checklist task frontend
+| # | Việc | File/thư mục | Trạng thái |
+|---|---|---|---|
+| 1 | Dọn Angular template mặc định, chỉ giữ router outlet | `frontend/src/app/app.component.html` | ✅ |
+| 2 | Tạo cấu trúc folder theo feature | `core/`, `features/`, `shared/` | ✅ |
+| 3 | Tạo config API base URL + token key | `core/config` | ⬜ |
+| 4 | Tạo models/interfaces dùng chung | `core/models` | ⬜ |
+| 5 | Tạo AuthService: login/register/lưu token/logout | `core/services/auth.service.ts` | ⬜ |
+| 6 | Tạo AuthInterceptor gắn JWT vào request | `core/interceptors` | ⬜ |
+| 7 | Tạo AuthGuard chặn route cần đăng nhập | `core/guards` | ⬜ |
+| 8 | Làm Login feature | `features/auth/login` | ⬜ |
+| 9 | Làm Register feature | `features/auth/register` | ⬜ |
+| 10 | Làm layout sau login | `shared` hoặc `features/dashboard` | ⬜ |
+| 11 | Làm Dashboard feature | `features/dashboard` | ⬜ |
+| 12 | Làm PIN feature | `features/account` | ⬜ |
+| 13 | Làm Deposit feature | `features/account` | ⬜ |
+| 14 | Làm Withdraw feature | `features/account` | ⬜ |
+| 15 | Làm Transfer feature | `features/account` | ⬜ |
+| 16 | Làm Transaction history feature | `features/transactions` | ⬜ |
+| 17 | Test full flow: register -> login -> dashboard -> PIN -> deposit -> withdraw -> transfer -> history | trình duyệt + backend thật | ⬜ |
+
+**NOTE:** Login/register không cần JWT. Các API dashboard/account/transaction cần JWT, nên phải xong `AuthInterceptor` trước khi test những màn hình đó.
+
+---
+
 ## Hướng dẫn sử dụng
 
 1. Mỗi lần mở máy: đọc file này để biết tiến độ.
