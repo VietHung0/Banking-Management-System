@@ -381,7 +381,7 @@ Route -> Component -> DTO/interface -> Service gọi API -> Logic trong componen
 ### 11 API backend sẽ dùng cho frontend
 | # | Feature | API backend | Mục đích | Trạng thái frontend |
 |---|---|---|---|---|
-| 1 | Register | `POST /api/users/register` | Đăng ký user + tự tạo account | ⬜ |
+| 1 | Register | `POST /api/users/register` | Đăng ký user + tự tạo account | ✅ |
 | 2 | Login | `POST /api/users/login` | Đăng nhập, nhận JWT | ⬜ |
 | 3 | Dashboard user | `GET /api/dashboard/user` | Lấy thông tin user đang login | ⬜ |
 | 4 | Dashboard account | `GET /api/dashboard/account` | Lấy thông tin account/số dư | ⬜ |
@@ -398,13 +398,13 @@ Route -> Component -> DTO/interface -> Service gọi API -> Logic trong componen
 |---|---|---|---|
 | 1 | Dọn Angular template mặc định, chỉ giữ router outlet | `frontend/src/app/app.component.html` | ✅ |
 | 2 | Tạo cấu trúc folder theo feature | `core/`, `features/`, `shared/` | ✅ |
-| 3 | Tạo config API base URL + token key | `core/config` | ⬜ |
-| 4 | Tạo models/interfaces dùng chung | `core/models` | ⬜ |
-| 5 | Tạo AuthService: login/register/lưu token/logout | `core/services/auth.service.ts` | ⬜ |
-| 6 | Tạo AuthInterceptor gắn JWT vào request | `core/interceptors` | ⬜ |
-| 7 | Tạo AuthGuard chặn route cần đăng nhập | `core/guards` | ⬜ |
-| 8 | Làm Login feature | `features/auth/login` | ⬜ |
-| 9 | Làm Register feature | `features/auth/register` | ⬜ |
+| 3 | Tạo config API base URL + token key | `core/config` | ✅ |
+| 4 | Tạo models/interfaces dùng chung | `core/models` | ✅ |
+| 5 | Tạo AuthService: login/register/lưu token/logout | `core/services/auth.service.ts` | ✅ |
+| 6 | Tạo AuthInterceptor gắn JWT vào request | `core/interceptors` | ✅ |
+| 7 | Tạo AuthGuard chặn route cần đăng nhập | `core/guards` | ✅ |
+| 8 | Làm Login feature | `features/auth/login` | ✅ form + route + gọi API |
+| 9 | Làm Register feature | `features/auth/register` | ✅ form + route + gọi API |
 | 10 | Làm layout sau login | `shared` hoặc `features/dashboard` | ⬜ |
 | 11 | Làm Dashboard feature | `features/dashboard` | ⬜ |
 | 12 | Làm PIN feature | `features/account` | ⬜ |

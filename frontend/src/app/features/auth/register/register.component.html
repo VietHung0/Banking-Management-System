@@ -1,0 +1,57 @@
+<main class="auth-page">
+  <section class="auth-panel">
+    <div class="brand">
+      <span class="brand-mark">B</span>
+      <div>
+        <h1>Tạo tài khoản</h1>
+        <p>Mở tài khoản Banking Management</p>
+      </div>
+    </div>
+
+    <form class="auth-form" (ngSubmit)="onSubmit()">
+      <label>
+        Họ tên
+        <input type="text" name="name" [(ngModel)]="registerRequest.name" required autocomplete="name">
+      </label>
+
+      <label>
+        Email
+        <input type="email" name="email" [(ngModel)]="registerRequest.email" required autocomplete="email">
+      </label>
+
+      <div class="phone-row">
+        <label>
+          Mã quốc gia
+          <input type="text" name="countryCode" [(ngModel)]="registerRequest.countryCode" required>
+        </label>
+
+        <label>
+          Số điện thoại
+          <input type="tel" name="phoneNumber" [(ngModel)]="registerRequest.phoneNumber" required autocomplete="tel">
+        </label>
+      </div>
+
+      <label>
+        Địa chỉ
+        <input type="text" name="address" [(ngModel)]="registerRequest.address" required autocomplete="street-address">
+      </label>
+
+      <label>
+        Mật khẩu
+        <input type="password" name="password" [(ngModel)]="registerRequest.password" required autocomplete="new-password">
+      </label>
+
+      <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
+      <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <button type="submit" [disabled]="isLoading">
+        {{ isLoading ? 'Đang đăng ký...' : 'Đăng ký' }}
+      </button>
+    </form>
+
+    <p class="switch-page">
+      Đã có tài khoản?
+      <a routerLink="/login">Đăng nhập</a>
+    </p>
+  </section>
+</main>
