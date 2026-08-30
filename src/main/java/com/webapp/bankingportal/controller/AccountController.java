@@ -1,5 +1,7 @@
 package com.webapp.bankingportal.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,10 +15,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.webapp.bankingportal.dto.PinRequest;
+import com.webapp.bankingportal.dto.PinStatusResponse;
 import com.webapp.bankingportal.dto.PinUpdateRequest;
+import com.webapp.bankingportal.dto.TransactionDTO;
 import com.webapp.bankingportal.dto.AmountRequest;
 import com.webapp.bankingportal.dto.FundTransferRequest;
 import com.webapp.bankingportal.util.LoggedinUser;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/account")
@@ -27,17 +33,15 @@ public class AccountController {
     private final TransactionService transactionService;
 
     @GetMapping("/pin/check")
-    public ResponseEntity<String> checkPin() {
-        boolean isPinCreated = accountService.isPinCreated(LoggedinUser.getAccountNumber());
+    public ResponseEntity<PinStatusResponse> checkPin() {
+        boolean hasPin = accountService.isPinCreated(LoggedinUser.getAccountNumber());
+        String message = hasPin ? "PIN đã được tạo" : "PIN chưa được tạo";
 
-        if (isPinCreated) {
-            return ResponseEntity.ok("PIN đã được tạo");
-        }
-        return ResponseEntity.ok("PIN chưa được tạo");
+        return ResponseEntity.ok(new PinStatusResponse(hasPin, message));
     }
 
     @PostMapping("/pin/create")
-    public ResponseEntity<String> createPin(@RequestBody PinRequest pinRequest) {
+    public ResponseEntity<String> createPin(@Valid @RequestBody PinRequest pinRequest) {
         accountService.createPin(
                 LoggedinUser.getAccountNumber(),
                 pinRequest.password(),
@@ -46,7 +50,7 @@ public class AccountController {
     }
 
     @PostMapping("/pin/update")
-    public ResponseEntity<String> updatePin(@RequestBody PinUpdateRequest pinUpdateRequest) {
+    public ResponseEntity<String> updatePin(@Valid @RequestBody PinUpdateRequest pinUpdateRequest) {
         accountService.updatePin(
                 LoggedinUser.getAccountNumber(),
                 pinUpdateRequest.oldPin(),
@@ -56,7 +60,7 @@ public class AccountController {
     }
 
     @PostMapping("/deposit")
-    public ResponseEntity<String> cashDeposit(@RequestBody AmountRequest amountRequest) {
+    public ResponseEntity<String> cashDeposit(@Valid @RequestBody AmountRequest amountRequest) {
         accountService.cashDeposit(
                 LoggedinUser.getAccountNumber(),
                 amountRequest.pin(),
@@ -65,7 +69,7 @@ public class AccountController {
     }
 
     @PostMapping("/withdraw")
-    public ResponseEntity<String> cashWithdrawal(@RequestBody AmountRequest amountRequest) {
+    public ResponseEntity<String> cashWithdrawal(@Valid @RequestBody AmountRequest amountRequest) {
         accountService.cashWithdrawal(
                 LoggedinUser.getAccountNumber(),
                 amountRequest.pin(),
@@ -74,7 +78,7 @@ public class AccountController {
     }
 
     @PostMapping("/fund-transfer")
-    public ResponseEntity<String> fundTransfer(@RequestBody FundTransferRequest fundTransferRequest) {
+    public ResponseEntity<String> fundTransfer(@Valid @RequestBody FundTransferRequest fundTransferRequest) {
         accountService.fundTransfer(
                 LoggedinUser.getAccountNumber(),
                 fundTransferRequest.targetAccountNumber(),
@@ -84,7 +88,7 @@ public class AccountController {
     }
 
     @GetMapping("/transactions")
-    public ResponseEntity<?> getAllTransactionByAccountNumber() {
+    public ResponseEntity<List<TransactionDTO>> getAllTransactionByAccountNumber() {
         return ResponseEntity.ok(
                 transactionService.getAllTransactionsByAccountNumber(
                         LoggedinUser.getAccountNumber()));

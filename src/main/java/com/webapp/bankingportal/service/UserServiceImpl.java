@@ -4,12 +4,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.webapp.bankingportal.dto.RegisterRequest;
+import com.webapp.bankingportal.entity.Account;
 import com.webapp.bankingportal.entity.User;
 import com.webapp.bankingportal.exception.UserInvalidException;
 import com.webapp.bankingportal.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-import com.webapp.bankingportal.entity.Account;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +23,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
 
-    public ResponseEntity<String> registerUser(User user) {
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+    public ResponseEntity<String> registerUser(RegisterRequest request) {
+        if (userRepository.findByEmail(request.email()).isPresent()) {
             throw new UserInvalidException("Email đã tồn tại");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        if (userRepository.findByPhoneNumber(request.phoneNumber()).isPresent()) {
+            throw new UserInvalidException("Số điện thoại đã tồn tại");
+        }
+
+        User user = new User();
+        user.setName(request.name());
+        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setEmail(request.email());
+        user.setCountryCode(request.countryCode());
+        user.setPhoneNumber(request.phoneNumber());
+        user.setAddress(request.address());
+
         User saveUser = userRepository.save(user);
         Account account = accountService.createAccount(saveUser);
         saveUser.setAccount(account);

@@ -3,7 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { API_BASE_URL } from '../config/api.config';
-import { AmountRequest, FundTransferRequest, PinRequest, PinUpdateRequest } from '../models/account.model';
+import {
+  AmountRequest,
+  FundTransferRequest,
+  PinRequest,
+  PinStatusResponse,
+  PinUpdateRequest
+} from '../models/account.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +17,8 @@ import { AmountRequest, FundTransferRequest, PinRequest, PinUpdateRequest } from
 export class AccountService {
   constructor(private http: HttpClient) {}
 
-  checkPin(): Observable<string> {
-    return this.http.get(`${API_BASE_URL}/account/pin/check`, {
-      responseType: 'text'
-    });
+  checkPin(): Observable<PinStatusResponse> {
+    return this.http.get<PinStatusResponse>(`${API_BASE_URL}/account/pin/check`);
   }
 
   createPin(request: PinRequest): Observable<string> {

@@ -1,4 +1,9 @@
 package com.webapp.bankingportal.dto;
 
-public record PinUpdateRequest(String oldPin, String newPin, String password) {
+import jakarta.validation.constraints.NotBlank;
+
+public record PinUpdateRequest(
+        @NotBlank String oldPin,
+        @NotBlank String newPin,
+        @NotBlank String password) {
 }

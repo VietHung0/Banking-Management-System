@@ -39,8 +39,8 @@ export class PinComponent {
     this.errorMessage = '';
     this.accountService.checkPin().subscribe({
       next: (response) => {
-        this.statusMessage = response;
-        this.hasPin = response.includes('đã được tạo');
+        this.statusMessage = response.message;
+        this.hasPin = response.hasPin;
       },
       error: () => {
         this.errorMessage = 'Không thể kiểm tra trạng thái PIN.';

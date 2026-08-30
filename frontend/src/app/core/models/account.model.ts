@@ -9,6 +9,11 @@ export interface PinUpdateRequest {
   password: string;
 }
 
+export interface PinStatusResponse {
+  hasPin: boolean;
+  message: string;
+}
+
 export interface AmountRequest {
   pin: string;
   amount: number;

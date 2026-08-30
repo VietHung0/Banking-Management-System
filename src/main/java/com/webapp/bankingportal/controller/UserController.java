@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.webapp.bankingportal.dto.LoginRequest;
 import com.webapp.bankingportal.dto.LoginResponse;
-import com.webapp.bankingportal.entity.User;
+import com.webapp.bankingportal.dto.RegisterRequest;
 import com.webapp.bankingportal.service.AuthService;
 import com.webapp.bankingportal.service.UserService;
 
@@ -25,15 +25,13 @@ public class UserController {
     private final UserService userService;
     private final AuthService authService;
 
-    // 👇 BẠN VIẾT METHOD: registerUser(@Valid @RequestBody User user)
-    // trả về ResponseEntity<String>, gọi userService.registerUser(user)
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@Valid @RequestBody User user) {
-        return userService.registerUser(user);
+    public ResponseEntity<String> registerUser(@Valid @RequestBody RegisterRequest request) {
+        return userService.registerUser(request);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
 }

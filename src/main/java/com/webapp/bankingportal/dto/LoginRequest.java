@@ -1,4 +1,8 @@
 package com.webapp.bankingportal.dto;
 
-public record LoginRequest(String identifier, String password) {
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginRequest(
+        @NotBlank String identifier,
+        @NotBlank String password) {
 }

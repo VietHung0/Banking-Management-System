@@ -429,6 +429,50 @@ Route -> Component -> DTO/interface -> Service gọi API -> Logic trong componen
 
 ---
 
+## 🔄 Mục tiêu tiếp theo — Optimize API + polish UI
+
+**Mục tiêu hiện tại:** 11 API chính đã chạy được end-to-end với frontend. Bước tiếp theo là tối ưu backend cho sạch/chuyên nghiệp hơn, rồi chỉnh frontend đẹp và sát UI gốc hơn.
+
+### Backend — tối ưu 11 API hiện có
+| # | Việc | Mục đích | Trạng thái |
+|---|---|---|---|
+| 1 | Chuẩn hóa success response JSON | Không trả text rời rạc, thống nhất dạng `{ message, data }` | ⬜ |
+| 2 | Chuẩn hóa error response JSON | Không trả `"Loi server"` chung chung, có `status/message/path/timestamp` | ⬜ |
+| 3 | Thêm validation cho request DTO | Check `amount > 0`, `amount <= 10000000`, PIN/password không rỗng | ⬜ |
+| 4 | Đổi register không nhận trực tiếp entity `User` | Tạo `RegisterRequest`, tránh expose entity ra API | ⬜ |
+| 5 | Thêm `@Transactional` cho deposit/withdraw/transfer | Đảm bảo nghiệp vụ tiền và transaction history cùng thành công/thất bại | ⬜ |
+| 6 | Review lại HTTP status | Sai PIN 400, account không tồn tại 404, token lỗi 401/403 rõ ràng | ⬜ |
+| 7 | Tối ưu dashboard API nếu cần | Có thể gom user/account thành `GET /api/dashboard` sau khi cân nhắc frontend | ⬜ |
+| 8 | Cải thiện JWT/security message | Token sai/hết hạn trả lỗi dễ hiểu hơn | ⬜ |
+| 9 | Thêm Swagger/OpenAPI | Dễ demo API khi phỏng vấn | ⬜ |
+| 10 | Viết README chạy backend/frontend | Người khác clone về có thể chạy project | ⬜ |
+| 11 | Test full flow sau khi tối ưu | Đảm bảo 11 API không regression | ⬜ |
+
+### Frontend — polish giống UI gốc
+| # | Việc | Mục đích | Trạng thái |
+|---|---|---|---|
+| 1 | So sánh `BankingPortal-UI` gốc | Lấy lại style/layout tốt, không sửa UI gốc | ⬜ |
+| 2 | Chỉnh layout/sidebar/header | App sau login nhìn giống sản phẩm hơn | ⬜ |
+| 3 | Chỉnh Login/Register UI | Màn hình auth đẹp và đồng nhất | ⬜ |
+| 4 | Chỉnh Dashboard card/số dư/account info | Dashboard dễ đọc, nổi bật thông tin chính | ⬜ |
+| 5 | Chỉnh form PIN/deposit/withdraw/transfer | Form gọn, rõ trạng thái loading/success/error | ⬜ |
+| 6 | Chỉnh bảng transaction history | Dễ scan giao dịch, format ngày/tiền rõ hơn | ⬜ |
+| 7 | Format tiền/ngày | Hiển thị `400,000 VND`, ngày giờ dễ đọc | ⬜ |
+| 8 | Đồng bộ error message theo backend mới | Frontend hiện đúng message trả từ API | ⬜ |
+| 9 | Responsive mobile/tablet | UI không vỡ khi màn hình nhỏ | ⬜ |
+| 10 | Test full flow bằng browser thật | Register -> login -> dashboard -> PIN -> deposit -> withdraw -> transfer -> history | ⬜ |
+
+### Thứ tự làm khuyến nghị
+```
+1. Tối ưu backend response/error/validation trước
+2. Sửa frontend service/component theo response backend mới
+3. Polish UI giống UI gốc
+4. Test full flow lại
+5. Viết README + chụp screenshot demo nếu cần
+```
+
+---
+
 ## Hướng dẫn sử dụng
 
 1. Mỗi lần mở máy: đọc file này để biết tiến độ.
