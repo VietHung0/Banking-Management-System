@@ -1,5 +1,11 @@
 .page-header {
-  margin-bottom: 24px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--brand-red);
+  border-radius: 8px;
+  margin: 0 auto 20px;
+  max-width: 980px;
+  padding: 22px 24px;
 }
 
 h1,
@@ -19,10 +25,47 @@ p {
 
 .form-card {
   background: #ffffff;
-  border: 1px solid #dde4ef;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  max-width: 520px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
   padding: 24px;
+}
+
+.work-panel {
+  align-items: start;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+  margin: 0 auto;
+  max-width: 980px;
+  width: 100%;
+}
+
+.card-label {
+  color: var(--brand-red);
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+h2 {
+  color: var(--ink);
+  font-size: 18px;
+  margin: 0 0 18px;
+}
+
+.guide-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  border-top: 4px solid var(--brand-red);
+  padding: 22px;
+}
+
+.guide-card p {
+  line-height: 1.7;
+  margin-top: 12px;
 }
 
 form {
@@ -38,22 +81,34 @@ label {
   gap: 8px;
 }
 
-input {
+input,
+textarea {
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   color: #162033;
   font-size: 16px;
-  min-height: 44px;
   padding: 0 12px;
 }
 
-input:focus {
-  border-color: #14532d;
-  outline: 3px solid rgba(20, 83, 45, 0.14);
+input {
+  min-height: 44px;
+}
+
+textarea {
+  line-height: 1.5;
+  min-height: 84px;
+  padding-top: 10px;
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--brand-red);
+  outline: 3px solid rgba(213, 0, 28, 0.14);
 }
 
 button {
-  background: #14532d;
+  background: var(--brand-red);
   border: 0;
   border-radius: 6px;
   color: #ffffff;
@@ -69,6 +124,8 @@ button:disabled {
 }
 
 .error-message,
+.lookup-message,
+.recipient-message,
 .success-message {
   border-radius: 6px;
   font-size: 14px;
@@ -86,4 +143,16 @@ button:disabled {
   background: #ecfdf5;
   border: 1px solid #bbf7d0;
   color: #047857;
+}
+
+.lookup-message {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+.recipient-message {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
 }

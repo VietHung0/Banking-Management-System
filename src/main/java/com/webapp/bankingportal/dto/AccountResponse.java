@@ -13,16 +13,20 @@ public class AccountResponse {
     private String accountNumber;
     private double balance;
     private String accountType;
+    private String bankCode;
+    private String bankAddress;
     private String branch;
-    private String ifscCode;
+    private String branchCode;
     private String accountStatus;
 
     public AccountResponse(Account account) {
         this.accountNumber = account.getAccountNumber();
         this.balance = account.getBalance();
         this.accountType = account.getAccountType();
-        this.branch = account.getBranch();
-        this.ifscCode = account.getIfscCode();
-        this.accountStatus = account.getAccountStatus();
+        this.bankCode = account.getBankCode() == null ? "0038" : account.getBankCode();
+        this.bankAddress = account.getBankAddress() == null ? "Tokyo" : account.getBankAddress();
+        this.branch = account.getBranch() == null ? "Ichigo Branch" : account.getBranch();
+        this.branchCode = account.getBranchCode() == null ? "101" : account.getBranchCode();
+        this.accountStatus = account.getAccountStatus() == null ? "Active" : account.getAccountStatus();
     }
 }

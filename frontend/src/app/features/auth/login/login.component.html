@@ -1,46 +1,54 @@
 <main class="auth-page">
-  <section class="auth-panel">
+  <header class="auth-header">
     <div class="brand">
-      <span class="brand-mark">B</span>
+      <span class="brand-mark">N</span>
       <div>
-        <h1>Banking Management</h1>
-        <p>Đăng nhập tài khoản của bạn</p>
+        <strong>NetBank Demo</strong>
+        <span>Internet Banking</span>
       </div>
     </div>
+  </header>
 
-    <form class="auth-form" (ngSubmit)="onSubmit()">
-      <label>
-        Email hoặc số tài khoản
-        <input
-          type="text"
-          name="identifier"
-          [(ngModel)]="loginRequest.identifier"
-          required
-          autocomplete="username"
-        >
-      </label>
+  <section class="auth-content">
+    <div class="login-box">
+      <h1>Đăng nhập</h1>
+      <p class="intro">Nhập email hoặc số tài khoản để truy cập dịch vụ ngân hàng trực tuyến.</p>
 
-      <label>
-        Mật khẩu
-        <input
-          type="password"
-          name="password"
-          [(ngModel)]="loginRequest.password"
-          required
-          autocomplete="current-password"
-        >
-      </label>
+      <form class="auth-form" (ngSubmit)="onSubmit()">
+        <label>
+          Email / Số tài khoản
+          <input
+            type="text"
+            name="identifier"
+            [(ngModel)]="loginRequest.identifier"
+            required
+            autocomplete="username"
+          >
+        </label>
 
-      <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+        <label>
+          Mật khẩu WEB
+          <input
+            type="password"
+            name="password"
+            [(ngModel)]="loginRequest.password"
+            required
+            autocomplete="current-password"
+          >
+        </label>
 
-      <button type="submit" [disabled]="isLoading">
-        {{ isLoading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
-      </button>
-    </form>
+        <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-    <p class="switch-page">
-      Chưa có tài khoản?
-      <a routerLink="/register">Đăng ký</a>
-    </p>
+        <button type="submit" [disabled]="isLoading">
+          {{ isLoading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+        </button>
+      </form>
+    </div>
+
+    <aside class="support-box">
+      <h2>Khách hàng mới</h2>
+      <p>Mở tài khoản demo để sử dụng dashboard, nạp tiền, rút tiền và chuyển khoản.</p>
+      <a routerLink="/register">Đăng ký tài khoản</a>
+    </aside>
   </section>
 </main>

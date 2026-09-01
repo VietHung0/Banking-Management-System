@@ -23,13 +23,21 @@ export interface FundTransferRequest {
   targetAccountNumber: string;
   pin: string;
   amount: number;
+  message: string;
+}
+
+export interface RecipientResponse {
+  accountNumber: string;
+  name: string;
 }
 
 export interface AccountResponse {
   accountNumber: string;
   balance: number;
   accountType: string;
+  bankCode: string;
+  bankAddress: string;
   branch: string;
-  ifscCode: string;
+  branchCode: string;
   accountStatus: string;
 }

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DatePipe, NgFor, NgIf } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgFor, NgIf } from '@angular/common';
 
 import { Transaction } from '../../../core/models/transaction.model';
 import { TransactionService } from '../../../core/services/transaction.service';
@@ -7,7 +7,7 @@ import { TransactionService } from '../../../core/services/transaction.service';
 @Component({
   selector: 'app-transaction-history',
   standalone: true,
-  imports: [NgFor, NgIf, DatePipe],
+  imports: [NgFor, NgIf, DatePipe, CurrencyPipe],
   templateUrl: './transaction-history.component.html',
   styleUrl: './transaction-history.component.css'
 })

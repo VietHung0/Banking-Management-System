@@ -1,16 +1,21 @@
 <section class="page-header">
   <div>
     <h1>PIN</h1>
-    <p>Tạo hoặc đổi PIN cho tài khoản đang đăng nhập</p>
+    <p>Quản lý mã PIN dùng để xác nhận giao dịch.</p>
   </div>
 </section>
 
-<p class="success-message" *ngIf="statusMessage">{{ statusMessage }}</p>
-<p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+<div class="message-slot">
+  <p class="success-message" *ngIf="statusMessage">{{ statusMessage }}</p>
+  <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+</div>
 
 <section class="form-grid">
-  <article>
+  <article class="form-card">
+    <span class="card-label">First setup</span>
     <h2>Tạo PIN</h2>
+    <p class="card-note">Dùng khi tài khoản chưa có PIN giao dịch.</p>
+
     <form (ngSubmit)="createPin()">
       <label>
         PIN mới
@@ -28,8 +33,11 @@
     </form>
   </article>
 
-  <article>
+  <article class="form-card">
+    <span class="card-label">Security</span>
     <h2>Đổi PIN</h2>
+    <p class="card-note">Dùng khi bạn muốn thay đổi PIN hiện tại.</p>
+
     <form (ngSubmit)="updatePin()">
       <label>
         PIN cũ

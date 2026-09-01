@@ -1,24 +1,31 @@
 import { Component } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgFor, NgIf } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 import { AccountResponse } from '../../../core/models/account.model';
 import { UserResponse } from '../../../core/models/dashboard.model';
+import { Transaction } from '../../../core/models/transaction.model';
 import { DashboardService } from '../../../core/services/dashboard.service';
+import { TransactionService } from '../../../core/services/transaction.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgIf],
+  imports: [NgIf, NgFor, CurrencyPipe, DatePipe, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent {
   user?: UserResponse;
   account?: AccountResponse;
+  recentTransactions: Transaction[] = [];
   errorMessage = '';
   isLoading = false;
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(
+    private dashboardService: DashboardService,
+    private transactionService: TransactionService
+  ) {}
 
   ngOnInit(): void {
     this.loadDashboard();
@@ -42,6 +49,15 @@ export class DashboardComponent {
         this.finishLoadingIfReady();
       },
       error: () => this.handleError()
+    });
+
+    this.transactionService.getTransactions().subscribe({
+      next: (transactions) => {
+        this.recentTransactions = transactions.slice(0, 5);
+      },
+      error: () => {
+        this.recentTransactions = [];
+      }
     });
   }
 

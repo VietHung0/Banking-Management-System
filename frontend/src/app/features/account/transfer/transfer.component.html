@@ -1,49 +1,78 @@
 <section class="page-header">
   <div>
     <h1>Transfer</h1>
-    <p>Chuyển tiền sang tài khoản khác</p>
+    <p>Chuyển tiền sang tài khoản khác.</p>
   </div>
 </section>
 
-<article class="form-card">
-  <form (ngSubmit)="onSubmit()">
-    <label>
-      Số tài khoản nhận
-      <input
-        type="text"
-        name="targetAccountNumber"
-        [(ngModel)]="transferRequest.targetAccountNumber"
-        required
-      >
-    </label>
+<section class="work-panel">
+  <article class="form-card">
+    <span class="card-label">Fund Transfer</span>
+    <h2>Thông tin chuyển khoản</h2>
 
-    <label>
-      Số tiền
-      <input
-        type="number"
-        name="amount"
-        min="1"
-        max="10000000"
-        [(ngModel)]="transferRequest.amount"
-        required
-      >
-    </label>
+    <form (ngSubmit)="onSubmit()">
+      <label>
+        Số tài khoản nhận
+        <input
+          type="text"
+          name="targetAccountNumber"
+          [(ngModel)]="transferRequest.targetAccountNumber"
+          (blur)="checkRecipient()"
+          required
+        >
+      </label>
 
-    <label>
-      PIN
-      <input
-        type="password"
-        name="pin"
-        [(ngModel)]="transferRequest.pin"
-        required
-      >
-    </label>
+      <p class="lookup-message" *ngIf="isCheckingRecipient">Đang kiểm tra tài khoản nhận...</p>
+      <p class="recipient-message" *ngIf="recipientName">
+        Người nhận: <strong>{{ recipientName }}</strong>
+      </p>
+      <p class="error-message" *ngIf="recipientMessage">{{ recipientMessage }}</p>
 
-    <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
-    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <label>
+        Số tiền
+        <input
+          type="number"
+          name="amount"
+          min="1"
+          max="10000000"
+          [(ngModel)]="transferRequest.amount"
+          required
+        >
+      </label>
 
-    <button type="submit" [disabled]="isLoading">
-      {{ isLoading ? 'Đang xử lý...' : 'Chuyển khoản' }}
-    </button>
-  </form>
-</article>
+      <label>
+        PIN
+        <input
+          type="password"
+          name="pin"
+          [(ngModel)]="transferRequest.pin"
+          required
+        >
+      </label>
+
+      <label>
+        Lời nhắn
+        <textarea
+          name="message"
+          rows="3"
+          maxlength="120"
+          [(ngModel)]="transferRequest.message"
+          placeholder="Ví dụ: Chuyển tiền tháng 8"
+        ></textarea>
+      </label>
+
+      <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
+      <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <button type="submit" [disabled]="isLoading">
+        {{ isLoading ? 'Đang xử lý...' : 'Chuyển khoản' }}
+      </button>
+    </form>
+  </article>
+
+  <aside class="guide-card">
+    <h2>Lưu ý chuyển khoản</h2>
+    <p>Kiểm tra đúng số tài khoản nhận trước khi xác nhận.</p>
+    <p>Số tiền mỗi lần giao dịch không vượt quá ¥10,000,000.</p>
+  </aside>
+</section>

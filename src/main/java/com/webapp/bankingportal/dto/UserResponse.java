@@ -14,7 +14,9 @@ public class UserResponse {
     private String phoneNumber;
     private String address;
     private String accountNumber;
-    private String ifscCode;
+    private String bankCode;
+    private String bankAddress;
+    private String branchCode;
     private String branch;
     private String accountType;
 
@@ -25,8 +27,10 @@ public class UserResponse {
         this.phoneNumber = user.getPhoneNumber();
         this.address = user.getAddress();
         this.accountNumber = user.getAccount().getAccountNumber();
-        this.ifscCode = user.getAccount().getIfscCode();
-        this.branch = user.getAccount().getBranch();
+        this.bankCode = user.getAccount().getBankCode() == null ? "0038" : user.getAccount().getBankCode();
+        this.bankAddress = user.getAccount().getBankAddress() == null ? "Tokyo" : user.getAccount().getBankAddress();
+        this.branchCode = user.getAccount().getBranchCode() == null ? "101" : user.getAccount().getBranchCode();
+        this.branch = user.getAccount().getBranch() == null ? "Ichigo Branch" : user.getAccount().getBranch();
         this.accountType = user.getAccount().getAccountType();
     }
 }

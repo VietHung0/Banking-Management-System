@@ -30,15 +30,19 @@ public class Account {
     private String accountNumber;
 
     @NotEmpty
-    private String accountType = "Savings";
+    private String accountType = "Ordinary Deposit";
 
     private String accountStatus;
 
     private double balance;
 
-    private String branch = "NIT";
+    private String bankCode = "0038";
 
-    private String ifscCode = "NIT001";
+    private String bankAddress = "Tokyo";
+
+    private String branch = "Ichigo Branch";
+
+    private String branchCode = "101";
 
     private String pin;
 

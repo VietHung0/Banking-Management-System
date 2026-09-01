@@ -2,6 +2,7 @@ package com.webapp.bankingportal.service;
 
 import com.webapp.bankingportal.entity.Account;
 import com.webapp.bankingportal.entity.User;
+import com.webapp.bankingportal.dto.RecipientResponse;
 
 public interface AccountService {
 
@@ -17,5 +18,7 @@ public interface AccountService {
 
     void cashWithdrawal(String accountNumber, String pin, double amount);
 
-    void fundTransfer(String sourceAccountNumber, String targetAccountNumber, String pin, double amount);
+    void fundTransfer(String sourceAccountNumber, String targetAccountNumber, String pin, double amount, String message);
+
+    RecipientResponse getRecipient(String accountNumber);
 }

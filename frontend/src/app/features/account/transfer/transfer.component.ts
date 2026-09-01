@@ -16,14 +16,41 @@ export class TransferComponent {
   transferRequest: FundTransferRequest = {
     targetAccountNumber: '',
     pin: '',
-    amount: 0
+    amount: 0,
+    message: ''
   };
 
   successMessage = '';
   errorMessage = '';
+  recipientName = '';
+  recipientMessage = '';
   isLoading = false;
+  isCheckingRecipient = false;
 
   constructor(private accountService: AccountService) {}
+
+  checkRecipient(): void {
+    const accountNumber = this.transferRequest.targetAccountNumber.trim();
+    this.recipientName = '';
+    this.recipientMessage = '';
+
+    if (!accountNumber) {
+      return;
+    }
+
+    this.isCheckingRecipient = true;
+
+    this.accountService.getRecipient(accountNumber).subscribe({
+      next: (recipient) => {
+        this.isCheckingRecipient = false;
+        this.recipientName = recipient.name;
+      },
+      error: () => {
+        this.isCheckingRecipient = false;
+        this.recipientMessage = 'Không tìm thấy tài khoản nhận.';
+      }
+    });
+  }
 
   onSubmit(): void {
     this.successMessage = '';
@@ -33,12 +60,17 @@ export class TransferComponent {
     this.accountService.transfer(this.transferRequest).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.successMessage = response;
+        this.successMessage = this.recipientName
+          ? `${response} tới ${this.recipientName}.`
+          : response;
         this.transferRequest = {
           targetAccountNumber: '',
           pin: '',
-          amount: 0
+          amount: 0,
+          message: ''
         };
+        this.recipientName = '';
+        this.recipientMessage = '';
       },
       error: () => {
         this.isLoading = false;

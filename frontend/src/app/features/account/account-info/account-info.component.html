@@ -1,0 +1,45 @@
+<p class="status" *ngIf="isLoading">Đang tải thông tin tài khoản...</p>
+<p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+<section class="account-page" *ngIf="!isLoading && !errorMessage">
+  <article class="balance-card">
+    <span>Main Account</span>
+    <h1>{{ account?.balance | currency:'JPY':'symbol':'1.0-0' }}</h1>
+    <p>Available balance</p>
+  </article>
+
+  <article class="detail-card">
+    <h2>Accounts & Cards</h2>
+
+    <div class="detail-list">
+      <div>
+        <span>Account Number</span>
+        <strong>{{ account?.accountNumber }}</strong>
+      </div>
+      <div>
+        <span>Account Type</span>
+        <strong>{{ account?.accountType }}</strong>
+      </div>
+      <div>
+        <span>Bank Code</span>
+        <strong>{{ account?.bankCode }}</strong>
+      </div>
+      <div>
+        <span>Bank Address</span>
+        <strong>{{ account?.bankAddress }}</strong>
+      </div>
+      <div>
+        <span>Branch</span>
+        <strong>{{ account?.branch }}</strong>
+      </div>
+      <div>
+        <span>Branch Code</span>
+        <strong>{{ account?.branchCode }}</strong>
+      </div>
+      <div>
+        <span>Status</span>
+        <strong>{{ account?.accountStatus }}</strong>
+      </div>
+    </div>
+  </article>
+</section>

@@ -1,8 +1,14 @@
 .page-header {
   align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--brand-red);
+  border-radius: 8px;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin: 0 auto 20px;
+  max-width: 980px;
+  padding: 22px 24px;
 }
 
 h1,
@@ -21,7 +27,7 @@ p {
 }
 
 button {
-  background: #14532d;
+  background: var(--brand-red);
   border: 0;
   border-radius: 6px;
   color: #ffffff;
@@ -35,9 +41,14 @@ button {
 .status,
 .error-message {
   background: #ffffff;
-  border: 1px solid #dde4ef;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 16px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 980px;
+  overflow-x: auto;
+  padding: 18px;
 }
 
 .error-message {
@@ -59,19 +70,36 @@ th,
 td {
   border-bottom: 1px solid #eef2f7;
   color: #334155;
-  padding: 12px;
+  padding: 14px 12px;
   text-align: left;
   white-space: nowrap;
 }
 
 th {
+  background: #f8fafc;
   color: #64748b;
   font-size: 13px;
+  padding: 12px;
   text-transform: uppercase;
 }
 
 tbody tr:last-child td {
   border-bottom: 0;
+}
+
+.type-badge {
+  background: var(--brand-red-soft);
+  border-radius: 999px;
+  color: var(--brand-red);
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 10px;
+}
+
+.amount {
+  color: var(--ink);
+  font-weight: 800;
 }
 
 @media (max-width: 860px) {

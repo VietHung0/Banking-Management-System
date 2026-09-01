@@ -1,75 +1,71 @@
-<section class="page-header">
-  <div>
-    <h1>Dashboard</h1>
-    <p>Tổng quan tài khoản ngân hàng</p>
-  </div>
-</section>
-
 <p class="status" *ngIf="isLoading">Đang tải dữ liệu...</p>
 <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-<section class="summary-grid" *ngIf="!isLoading && !errorMessage">
-  <article class="summary-card">
-    <span class="label">Số dư</span>
-    <strong>{{ account?.balance }}</strong>
-    <span class="meta">Account {{ account?.accountNumber }}</span>
-  </article>
+<section class="dashboard-page" *ngIf="!isLoading && !errorMessage">
+  <section class="summary-panel">
+    <div class="summary-heading">
+      <div>
+        <p class="welcome">Xin chào, {{ user?.name }}</p>
+        <span class="eyebrow">Main Account</span>
+        <h1>{{ account?.balance | currency:'JPY':'symbol':'1.0-0' }}</h1>
+        <p>Available balance</p>
+      </div>
 
-  <article class="summary-card">
-    <span class="label">Loại tài khoản</span>
-    <strong>{{ account?.accountType }}</strong>
-    <span class="meta">{{ account?.branch }} - {{ account?.ifscCode }}</span>
-  </article>
+      <div class="account-number">
+        <span>Account Number</span>
+        <strong>{{ account?.accountNumber }}</strong>
+      </div>
+    </div>
+  </section>
 
-  <article class="summary-card">
-    <span class="label">Trạng thái</span>
-    <strong>{{ account?.accountStatus }}</strong>
-    <span class="meta">Chủ tài khoản {{ user?.name }}</span>
-  </article>
-</section>
+  <section class="quick-actions">
+    <a routerLink="/account">
+      <span>A</span>
+      Account
+    </a>
+    <a routerLink="/account/deposit">
+      <span>D</span>
+      Deposit
+    </a>
+    <a routerLink="/account/withdraw">
+      <span>W</span>
+      Withdraw
+    </a>
+    <a routerLink="/account/fund-transfer">
+      <span>T</span>
+      Transfer
+    </a>
+    <a routerLink="/account/pin">
+      <span>P</span>
+      PIN
+    </a>
+    <a routerLink="/account/transactions">
+      <span>H</span>
+      History
+    </a>
+  </section>
 
-<section class="detail-grid" *ngIf="!isLoading && !errorMessage">
-  <article>
-    <h2>Thông tin user</h2>
-    <dl>
-      <div>
-        <dt>Họ tên</dt>
-        <dd>{{ user?.name }}</dd>
+  <section class="home-grid">
+    <article class="recent-card">
+      <div class="recent-header">
+        <div>
+          <span>Recent Activity</span>
+          <h2>Latest Transactions</h2>
+        </div>
+        <a routerLink="/account/transactions">View all</a>
       </div>
-      <div>
-        <dt>Email</dt>
-        <dd>{{ user?.email }}</dd>
-      </div>
-      <div>
-        <dt>Số điện thoại</dt>
-        <dd>{{ user?.countryCode }} {{ user?.phoneNumber }}</dd>
-      </div>
-      <div>
-        <dt>Địa chỉ</dt>
-        <dd>{{ user?.address }}</dd>
-      </div>
-    </dl>
-  </article>
 
-  <article>
-    <h2>Thông tin account</h2>
-    <dl>
-      <div>
-        <dt>Số tài khoản</dt>
-        <dd>{{ account?.accountNumber }}</dd>
+      <p class="empty-state" *ngIf="recentTransactions.length === 0">Chưa có giao dịch nào.</p>
+
+      <div class="recent-list" *ngIf="recentTransactions.length > 0">
+        <div class="recent-item" *ngFor="let transaction of recentTransactions">
+          <div>
+            <strong>{{ transaction.transactionType }}</strong>
+            <span>{{ transaction.transactionDate | date: 'yyyy/MM/dd HH:mm' }}</span>
+          </div>
+          <strong class="amount">{{ transaction.amount | currency:'JPY':'symbol':'1.0-0' }}</strong>
+        </div>
       </div>
-      <div>
-        <dt>IFSC</dt>
-        <dd>{{ account?.ifscCode }}</dd>
-      </div>
-      <div>
-        <dt>Chi nhánh</dt>
-        <dd>{{ account?.branch }}</dd>
-      </div>
-      <div>
-        <dt>Loại tài khoản</dt>
-        <dd>{{ account?.accountType }}</dd>
-      </div>
-    </dl>
-  </article>
+    </article>
+  </section>
 </section>

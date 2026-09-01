@@ -1,7 +1,7 @@
 <section class="page-header">
   <div>
     <h1>Transactions</h1>
-    <p>Lịch sử giao dịch của tài khoản đang đăng nhập</p>
+    <p>Lịch sử giao dịch của tài khoản đang đăng nhập.</p>
   </div>
 
   <button type="button" (click)="loadTransactions()">Refresh</button>
@@ -16,22 +16,24 @@
   <table *ngIf="transactions.length > 0">
     <thead>
       <tr>
-        <th>ID</th>
         <th>Loại</th>
         <th>Số tiền</th>
         <th>Nguồn</th>
         <th>Đích</th>
+        <th>Lời nhắn</th>
         <th>Thời gian</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let transaction of transactions">
-        <td>{{ transaction.id }}</td>
-        <td>{{ transaction.transactionType }}</td>
-        <td>{{ transaction.amount }}</td>
+        <td>
+          <span class="type-badge">{{ transaction.transactionType }}</span>
+        </td>
+        <td class="amount">{{ transaction.amount | currency:'JPY':'symbol':'1.0-0' }}</td>
         <td>{{ transaction.sourceAccountNumber }}</td>
         <td>{{ transaction.targetAccountNumber }}</td>
-        <td>{{ transaction.transactionDate | date: 'short' }}</td>
+        <td>{{ transaction.message || '-' }}</td>
+        <td>{{ transaction.transactionDate | date: 'yyyy/MM/dd HH:mm' }}</td>
       </tr>
     </tbody>
   </table>

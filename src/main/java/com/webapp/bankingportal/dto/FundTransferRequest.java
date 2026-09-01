@@ -9,5 +9,6 @@ public record FundTransferRequest(
         @NotBlank String pin,
         @Positive(message = "Số tiền phải lớn hơn 0")
         @DecimalMax(value = "10000000", message = "Số tiền không được vượt quá 10000000")
-        double amount) {
+        double amount,
+        String message) {
 }

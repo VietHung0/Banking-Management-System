@@ -1,17 +1,47 @@
 <div class="app-shell">
   <aside class="sidebar">
     <div class="brand">
-      <span class="brand-mark">B</span>
-      <span>Banking Management</span>
+      <span class="brand-mark">N</span>
+      <span>NetBank Demo</span>
     </div>
 
+    <a class="user-card" routerLink="/profile" routerLinkActive="active-profile">
+      <span class="avatar">{{ getInitials() }}</span>
+      <span>
+        <strong>{{ user?.name || 'User' }}</strong>
+        <small>My profile</small>
+      </span>
+    </a>
+
     <nav>
-      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-      <a routerLink="/account/pin" routerLinkActive="active">PIN</a>
-      <a routerLink="/account/deposit" routerLinkActive="active">Deposit</a>
-      <a routerLink="/account/withdraw" routerLinkActive="active">Withdraw</a>
-      <a routerLink="/account/fund-transfer" routerLinkActive="active">Transfer</a>
-      <a routerLink="/account/transactions" routerLinkActive="active">Transactions</a>
+      <a routerLink="/dashboard" routerLinkActive="active">
+        <i class="fas fa-tachometer-alt nav-icon"></i>
+        Dashboard
+      </a>
+      <a routerLink="/account/deposit" routerLinkActive="active">
+        <i class="fas fa-money-bill-wave nav-icon"></i>
+        Deposit
+      </a>
+      <a routerLink="/account/withdraw" routerLinkActive="active">
+        <i class="fas fa-money-bill nav-icon"></i>
+        Withdraw
+      </a>
+      <a routerLink="/account/fund-transfer" routerLinkActive="active">
+        <i class="fas fa-exchange-alt nav-icon"></i>
+        Fund Transfer
+      </a>
+      <a routerLink="/account/pin" routerLinkActive="active">
+        <i class="fas fa-key nav-icon"></i>
+        Account PIN
+      </a>
+      <a routerLink="/account" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <i class="fas fa-address-card nav-icon"></i>
+        Accounts & Cards
+      </a>
+      <a routerLink="/account/transactions" routerLinkActive="active">
+        <i class="fas fa-history nav-icon"></i>
+        Transaction History
+      </a>
     </nav>
 
     <button type="button" (click)="logout()">Logout</button>

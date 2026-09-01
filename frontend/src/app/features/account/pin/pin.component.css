@@ -1,5 +1,11 @@
 .page-header {
-  margin-bottom: 24px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--brand-red);
+  border-radius: 8px;
+  margin: 0 auto 20px;
+  max-width: 980px;
+  padding: 22px 24px;
 }
 
 h1,
@@ -28,17 +34,47 @@ p {
   display: grid;
   gap: 16px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0 auto;
+  max-width: 980px;
+  width: 100%;
 }
 
-article {
+.message-slot {
+  margin: 0 auto;
+  max-width: 980px;
+  min-height: 48px;
+}
+
+.form-card {
   background: #ffffff;
-  border: 1px solid #dde4ef;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 20px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  min-height: 390px;
+  padding: 24px;
+}
+
+.card-label {
+  color: var(--brand-red);
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.card-note {
+  border-bottom: 1px solid var(--line);
+  line-height: 1.6;
+  margin: 0 0 18px;
+  padding-bottom: 18px;
 }
 
 form {
-  display: grid;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   gap: 16px;
 }
 
@@ -60,18 +96,19 @@ input {
 }
 
 input:focus {
-  border-color: #14532d;
-  outline: 3px solid rgba(20, 83, 45, 0.14);
+  border-color: var(--brand-red);
+  outline: 3px solid rgba(213, 0, 28, 0.14);
 }
 
 button {
-  background: #14532d;
+  background: var(--brand-red);
   border: 0;
   border-radius: 6px;
   color: #ffffff;
   cursor: pointer;
   font-size: 16px;
   font-weight: 700;
+  margin-top: auto;
   min-height: 44px;
 }
 
@@ -84,7 +121,7 @@ button:disabled {
 .success-message {
   border-radius: 6px;
   font-size: 14px;
-  margin: 0 0 16px;
+  margin: 0;
   padding: 10px 12px;
 }
 
@@ -100,7 +137,7 @@ button:disabled {
   color: #047857;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1000px) {
   .form-grid {
     grid-template-columns: 1fr;
   }

@@ -8,7 +8,8 @@ import {
   FundTransferRequest,
   PinRequest,
   PinStatusResponse,
-  PinUpdateRequest
+  PinUpdateRequest,
+  RecipientResponse
 } from '../models/account.model';
 
 @Injectable({
@@ -48,6 +49,12 @@ export class AccountService {
   transfer(request: FundTransferRequest): Observable<string> {
     return this.http.post(`${API_BASE_URL}/account/fund-transfer`, request, {
       responseType: 'text'
+    });
+  }
+
+  getRecipient(accountNumber: string): Observable<RecipientResponse> {
+    return this.http.get<RecipientResponse>(`${API_BASE_URL}/account/recipient`, {
+      params: { accountNumber }
     });
   }
 }

@@ -1,0 +1,53 @@
+<p class="status" *ngIf="isLoading">Đang tải profile...</p>
+<p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+<section class="profile-page" *ngIf="!isLoading && !errorMessage">
+  <article class="profile-card">
+    <div class="profile-header">
+      <span>{{ user?.name?.charAt(0) || 'U' }}</span>
+      <div>
+        <h1>{{ user?.name }}</h1>
+        <p>Customer Profile</p>
+      </div>
+    </div>
+
+    <div class="profile-list">
+      <div>
+        <span>Email</span>
+        <strong>{{ user?.email }}</strong>
+      </div>
+      <div>
+        <span>Phone Number</span>
+        <strong>{{ user?.countryCode }} {{ user?.phoneNumber }}</strong>
+      </div>
+      <div>
+        <span>Address</span>
+        <strong>{{ user?.address }}</strong>
+      </div>
+      <div>
+        <span>Account Number</span>
+        <strong>{{ user?.accountNumber }}</strong>
+      </div>
+      <div>
+        <span>Bank Code</span>
+        <strong>{{ user?.bankCode }}</strong>
+      </div>
+      <div>
+        <span>Bank Address</span>
+        <strong>{{ user?.bankAddress }}</strong>
+      </div>
+      <div>
+        <span>Branch</span>
+        <strong>{{ user?.branch }}</strong>
+      </div>
+      <div>
+        <span>Branch Code</span>
+        <strong>{{ user?.branchCode }}</strong>
+      </div>
+      <div>
+        <span>Account Type</span>
+        <strong>{{ user?.accountType }}</strong>
+      </div>
+    </div>
+  </article>
+</section>

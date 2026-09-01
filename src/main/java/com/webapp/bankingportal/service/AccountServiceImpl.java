@@ -6,9 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.webapp.bankingportal.repository.AccountRepository;
 import com.webapp.bankingportal.repository.TransactionRepository;
+import com.webapp.bankingportal.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.webapp.bankingportal.entity.Account;
 import com.webapp.bankingportal.entity.User;
@@ -18,6 +19,7 @@ import com.webapp.bankingportal.exception.InvalidPinException;
 import java.util.Date;
 import com.webapp.bankingportal.entity.Transaction;
 import com.webapp.bankingportal.entity.TransactionType;
+import com.webapp.bankingportal.dto.RecipientResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +28,13 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Account createAccount(User user) {
         Account account = new Account();
         account.setAccountNumber(generateUniqueAccountNumber());
+        account.setAccountStatus("Active");
         account.setBalance(0.0);
         account.setUser(user);
         return accountRepository.save(account);
@@ -39,9 +43,7 @@ public class AccountServiceImpl implements AccountService {
     private String generateUniqueAccountNumber() {
         String accountNumber;
         do {
-            accountNumber = UUID.randomUUID().toString()
-                    .replace("-", "")
-                    .substring(0, 6);
+            accountNumber = String.format("%07d", ThreadLocalRandom.current().nextInt(10_000_000));
         } while (accountRepository.findByAccountNumber(accountNumber) != null);
 
         return accountNumber;
@@ -183,7 +185,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     @Override
-    public void fundTransfer(String sourceAccountNumber, String targetAccountNumber, String pin, double amount) {
+    public void fundTransfer(String sourceAccountNumber, String targetAccountNumber, String pin, double amount, String message) {
         validatePin(sourceAccountNumber, pin);
         validateAmount(amount);
 
@@ -212,9 +214,18 @@ public class AccountServiceImpl implements AccountService {
         transaction.setAmount(amount);
         transaction.setTransactionType(TransactionType.CASH_TRANSFER);
         transaction.setTransactionDate(new Date());
+        transaction.setMessage(message);
         transaction.setSourceAccount(sourceAccount);
         transaction.setTargetAccount(targetAccount);
         transactionRepository.save(transaction);
+    }
+
+    @Override
+    public RecipientResponse getRecipient(String accountNumber) {
+        User user = userRepository.findByAccountAccountNumber(accountNumber)
+                .orElseThrow(() -> new AccountNotFoundException("Không tìm thấy tài khoản nhận"));
+
+        return new RecipientResponse(accountNumber, user.getName());
     }
 
 }

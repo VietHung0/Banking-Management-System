@@ -26,6 +26,8 @@ public class Transaction {
 
     private Date transactionDate;
 
+    private String message;
+
     @ManyToOne
     @JoinColumn(name = "source_account_id")
     private Account sourceAccount;

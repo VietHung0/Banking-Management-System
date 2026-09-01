@@ -15,12 +15,39 @@
 | **3** | Account + PIN (đổi lên trước — login cần accountNumber) | ✅ xong, đã test chạy thật | ~15% |
 | **4** | Login + JWT + Security | ✅ xong, đã test chạy thật | ~12% |
 | **5** | Gửi / rút tiền / chuyển khoản | ✅ xong, đã test chạy thật | ~15% |
-| **6** | Transaction + sao kê email | ⬜ | ~10% |
-| **7** | OTP + reset password | ⬜ | ~10% |
-| **8** | Dashboard + cache (Redis/Caffeine) | ⬜ | ~10% |
-| **9** | Hoàn thiện (CORS, Swagger, util, test) | ⬜ | ~15% |
+| **6** | Transaction history + message chuyển tiền | ✅ xong core, bỏ qua email tạm thời | ~10% |
+| **7** | OTP + reset password | ⬜ backlog phụ | ~10% |
+| **8** | Dashboard + cache (Redis/Caffeine) | ✅ dashboard xong, cache backlog phụ | ~10% |
+| **9** | Hoàn thiện (CORS, Swagger, util, test) | 🔄 core đã xong, còn polish tài liệu/test | ~15% |
 
 > **Đã chốt (1):** JWT tách khỏi GĐ2. **Đã chốt (2):** đổi thứ tự — **GĐ3 = Account + PIN trước** (login bản gốc dùng `user.getAccount().getAccountNumber()`), **GĐ4 = Login + JWT**.
+
+### Mốc hiện tại — Core API + UI đã hoàn thiện
+
+**Đã xong mốc lớn:** backend có đủ 11 API chính và frontend đã nối được toàn bộ flow chính:
+
+- Register
+- Login
+- Dashboard user
+- Dashboard account
+- Check PIN
+- Create PIN
+- Update PIN
+- Deposit
+- Withdraw
+- Fund Transfer
+- Transaction History
+
+**UI đã hoàn thiện ở mức demo/phỏng vấn:**
+
+- Login/Register theo phong cách web banking.
+- Main layout sau login có sidebar cố định.
+- Dashboard, Profile, Account Info, PIN, Deposit, Withdraw, Fund Transfer, Transaction History đã có màn riêng.
+- Format domain theo hướng ngân hàng Nhật: JPY, account number 7 chữ số, bank code `0038`, branch/branch code, account status.
+- Fund Transfer đã có tra tên người nhận theo account number.
+- Fund Transfer đã có lời nhắn chuyển tiền và lưu vào transaction history.
+
+**Kết luận hiện tại:** Project đã đủ để demo chức năng core end-to-end. Phần còn lại chủ yếu là tính năng phụ/hạ tầng để giống API gốc hơn.
 
 ---
 
@@ -282,9 +309,9 @@ Save cả 2 account
 
 ---
 
-## ⬜ Giai đoạn 6 — Transaction history + sao kê email
+## ✅ Giai đoạn 6 — Transaction history + message chuyển tiền
 
-**Mục tiêu:** Mỗi lần deposit/withdraw/transfer thành công thì hệ thống phải lưu lại lịch sử giao dịch. Sau đó user có thể xem lịch sử giao dịch và gửi sao kê về email.
+**Mục tiêu:** Mỗi lần deposit/withdraw/transfer thành công thì hệ thống phải lưu lại lịch sử giao dịch. User có thể xem lịch sử giao dịch trên frontend. Riêng sao kê email tạm thời bỏ qua, để backlog phụ.
 
 ### Checklist task
 | # | Việc | File dự kiến | Trạng thái |
@@ -304,11 +331,13 @@ Save cả 2 account
 | 13 | Thêm API xem lịch sử giao dịch | `controller/AccountController.java` | ✅ |
 | 14 | Test deposit/withdraw/transfer sinh transaction đúng | curl + DB | ✅ |
 | 15 | Test API xem transaction history bằng JWT | curl | ✅ |
-| 16 | Thêm dependency/config gửi email nếu làm sao kê | `pom.xml`, `application.properties` | ⬜ |
-| 17 | Viết logic gửi sao kê email | `service/TransactionServiceImpl.java` | ⬜ |
-| 18 | Thêm API gửi sao kê email | `controller/AccountController.java` | ⬜ |
-| 19 | Test gửi sao kê email | curl/email inbox | ⬜ |
-| 20 | Note kết quả test vào roadmap | `ROADMAP.md` | ⬜ |
+| 16 | Thêm API tra tên người nhận khi nhập account nhận | `controller/AccountController.java`, `service/AccountServiceImpl.java`, `dto/RecipientResponse.java` | ✅ |
+| 17 | Thêm lời nhắn chuyển tiền | `dto/FundTransferRequest.java`, `entity/Transaction.java` | ✅ |
+| 18 | Hiển thị lời nhắn trong transaction history | `TransactionDTO`, Angular transaction model/history UI | ✅ |
+| 19 | Thêm dependency/config gửi email nếu làm sao kê | `pom.xml`, `application.properties` | ⬜ backlog |
+| 20 | Viết logic gửi sao kê email | `service/TransactionServiceImpl.java` | ⬜ backlog |
+| 21 | Thêm API gửi sao kê email | `controller/AccountController.java` | ⬜ backlog |
+| 22 | Test gửi sao kê email | curl/email inbox | ⬜ backlog |
 
 ### Luồng lưu transaction
 ```
@@ -334,20 +363,33 @@ TransactionServiceImpl tìm transaction liên quan accountNumber
 Trả danh sách TransactionDTO
 ```
 
-### Luồng gửi sao kê email
+### Luồng tra người nhận khi chuyển khoản
 ```
-Client gọi GET /api/account/send-statement có JWT
+User nhập account nhận ở Fund Transfer
    ↓
-AccountController lấy accountNumber từ LoggedinUser
+Frontend gọi GET /api/account/recipient?accountNumber=...
    ↓
-TransactionServiceImpl lấy user email + danh sách transaction
+Backend tìm User bằng accountNumber
    ↓
-Format nội dung sao kê
+Trả về RecipientResponse(accountNumber, name)
    ↓
-Gửi email
+Frontend hiển thị "Người nhận: ..."
 ```
 
-**NOTE phỏng vấn backend:** Nếu thời gian gấp, ưu tiên xong chắc task 1–15 trước. Email sao kê là điểm cộng, nhưng transaction history mới là phần quan trọng nhất.
+### Luồng lưu lời nhắn chuyển tiền
+```
+User nhập message ở Fund Transfer
+   ↓
+Frontend gửi message trong FundTransferRequest
+   ↓
+AccountServiceImpl xử lý chuyển tiền
+   ↓
+Nếu thành công thì lưu message vào Transaction
+   ↓
+Transaction History hiển thị cột Lời nhắn
+```
+
+**NOTE phỏng vấn backend:** Transaction history là phần core. Email sao kê là điểm cộng, không bắt buộc để demo luồng chính.
 
 ### Kết quả đã test phần Transaction History
 - App start OK, Hibernate tạo bảng `transaction` với 2 khóa ngoại `source_account_id`, `target_account_id`.
@@ -360,11 +402,243 @@ Gửi email
   - `CASH_WITHDRAWAL`: source `766cc7`, target `NULL`
   - `CASH_TRANSFER`: source `766cc7`, target `dd3d2f`
 - `GET /api/account/transactions` có JWT → 200, trả list `TransactionDTO` đúng.
+- `GET /api/account/recipient?accountNumber=...` có JWT → trả accountNumber + name của người nhận.
+- `POST /api/account/fund-transfer` có thêm `message`; Hibernate đã thêm cột `message` vào bảng `transaction`.
+- Transaction History đã bỏ cột ID và thêm cột `Lời nhắn`.
 
 ---
 
-## ⬜ Giai đoạn 7–9 (chưa bắt đầu)
-Giai đoạn 7 → 9 lặp lại **đúng kiến trúc Giai đoạn 2**, chỉ đổi nghiệp vụ (OTP, dashboard, hoàn thiện).
+## ⬜ Giai đoạn 7–9 — Backlog phụ so với API gốc
+
+Các phần này chưa bắt buộc cho demo core, nhưng nếu muốn giống `BankingPortal-API` gốc đầy đủ hơn thì làm sau:
+
+- Logout API phía backend.
+- Update user/profile API.
+- OTP login.
+- Forgot password/reset password bằng OTP.
+- Email service: welcome email, OTP email, login notification email.
+- Send bank statement email.
+- Cache/idempotency cho PIN/deposit/withdraw/transfer để tránh submit lặp.
+- Redis/cache config.
+- Geolocation login notification.
+- Swagger/OpenAPI docs.
+
+### Plan chi tiết API còn thiếu so với project gốc
+
+**Mục tiêu:** Bổ sung các API/hạ tầng phụ còn thiếu để project mới tiến gần `BankingPortal-API` gốc hơn. Làm theo thứ tự dưới đây để không phá flow core đã ổn.
+
+### API bổ sung 1 — Logout
+
+**Endpoint dự kiến:** `GET /api/users/logout`
+
+**Mục đích:** Khi user logout, frontend xóa token localStorage; backend có thể đánh dấu token không còn dùng được nếu làm token table/revoke đầy đủ.
+
+| # | Task | Cần thêm/sửa | Ghi chú |
+|---|---|---|---|
+| 1 | Kiểm tra `Token` entity hiện tại | `entity/Token.java` | Xem đã có token, expiry, account chưa |
+| 2 | Tạo `TokenRepository` nếu chưa có | `repository/TokenRepository.java` | Tìm token theo chuỗi JWT |
+| 3 | Thêm method logout | `service/AuthService` hoặc `UserService` | Nên để trong `AuthService` cho đúng nghiệp vụ auth |
+| 4 | Xử lý revoke/delete token | `service/AuthServiceImpl` | Cách đơn giản: delete token hoặc set expired |
+| 5 | Thêm controller endpoint | `controller/AuthController` hoặc `UserController` | Project gốc để `/api/users/logout`, project mới có thể cân nhắc `/api/auth/logout` |
+| 6 | Sửa frontend logout | `auth.service.ts`, `main-layout.component.ts` | Gọi API logout rồi xóa localStorage |
+| 7 | Test | Browser/curl | Login -> gọi API riêng -> token cũ không dùng được nếu có revoke |
+
+**Ưu tiên:** Trung bình. Frontend hiện logout localStorage đã đủ demo, backend logout là điểm cộng.
+
+### API bổ sung 2 — Update User/Profile
+
+**Endpoint dự kiến:** `POST /api/users/update` hoặc `PUT /api/users/profile`
+
+**Mục đích:** User cập nhật thông tin cá nhân: name, phoneNumber, address, countryCode. Không cho đổi password/account ở API này.
+
+| # | Task | Cần thêm/sửa | Ghi chú |
+|---|---|---|---|
+| 1 | Tạo DTO request | `dto/UpdateUserRequest.java` | Không nhận trực tiếp entity `User` |
+| 2 | Tạo DTO response nếu cần | `dto/UserResponse.java` | Có thể dùng lại `UserResponse` |
+| 3 | Thêm method service | `service/UserService.java` | `updateUser(String accountNumber, UpdateUserRequest request)` |
+| 4 | Viết logic update | `service/UserServiceImpl.java` | Lấy user từ `LoggedinUser.getAccountNumber()` rồi update field cho phép |
+| 5 | Validate dữ liệu | DTO + service | Email/phone nếu cho sửa thì phải check trùng |
+| 6 | Thêm controller endpoint | `controller/UserController.java` | API cần JWT |
+| 7 | Thêm frontend form edit profile | `features/profile` | Có thể làm sau backend |
+| 8 | Test | Browser/curl | Update xong reload profile thấy data mới |
+
+**Ưu tiên:** Cao. Đây là tính năng thực tế, dễ nói trong phỏng vấn.
+
+### API bổ sung 3 — OTP Login
+
+**Endpoint gốc:**
+
+- `POST /api/users/generate-otp`
+- `POST /api/users/verify-otp`
+
+**Mục đích:** User nhập email/accountNumber để nhận OTP qua email, sau đó nhập OTP để login và nhận JWT.
+
+| # | Task | Cần thêm/sửa | Ghi chú |
+|---|---|---|---|
+| 1 | Tạo DTO OTP request | `dto/OtpRequest.java` | Nhận `identifier` |
+| 2 | Tạo DTO verify OTP | `dto/OtpVerificationRequest.java` | Nhận `identifier`, `otp` |
+| 3 | Tạo entity OTP | `entity/OtpInfo.java` | Lưu accountNumber, otp, generatedAt |
+| 4 | Tạo repository OTP | `repository/OtpInfoRepository.java` | Tìm theo accountNumber, otp |
+| 5 | Tạo OTP service | `service/OtpService.java`, `OtpServiceImpl.java` | Generate 6 số, validate hết hạn |
+| 6 | Kết nối email service | `EmailService` | Gửi OTP về email thật |
+| 7 | Thêm API generate OTP | `UserController` hoặc `AuthController` | Public endpoint |
+| 8 | Thêm API verify OTP | `UserController` hoặc `AuthController` | Verify đúng thì trả JWT |
+| 9 | Thêm frontend màn OTP login | `features/auth` | Có thể thêm sau |
+| 10 | Test | Email inbox/browser | Generate OTP -> nhận mail -> verify -> login |
+
+**Ưu tiên:** Trung bình/cao. Tốt cho phỏng vấn security/auth, nhưng mất thời gian hơn update profile/logout.
+
+### API bổ sung 4 — Forgot Password / Reset Password
+
+**Endpoint gốc:**
+
+- `POST /api/auth/password-reset/send-otp`
+- `POST /api/auth/password-reset/verify-otp`
+- `POST /api/auth/password-reset`
+
+**Mục đích:** User quên mật khẩu, nhận OTP qua email, verify OTP, sau đó đổi password mới.
+
+| # | Task | Cần thêm/sửa | Ghi chú |
+|---|---|---|---|
+| 1 | Tạo DTO reset password | `dto/ResetPasswordRequest.java` | Nhận resetToken/newPassword |
+| 2 | Tạo entity reset token | `entity/PasswordResetToken.java` | Lưu token, expiry, user/account |
+| 3 | Tạo repository reset token | `repository/PasswordResetTokenRepository.java` | Tìm token hợp lệ |
+| 4 | Dùng lại OTP service | `OtpService` | Không viết lại logic OTP |
+| 5 | Thêm method auth service | `AuthService.java` | sendOtp, verifyOtp, resetPassword |
+| 6 | Viết logic send OTP | `AuthServiceImpl.java` | Tìm user theo identifier, gửi OTP |
+| 7 | Viết logic verify OTP | `AuthServiceImpl.java` | OTP đúng thì sinh reset token |
+| 8 | Viết logic reset password | `AuthServiceImpl.java` | Encode BCrypt password mới |
+| 9 | Thêm frontend forgot password flow | `features/auth/forgot-password` | Làm sau backend |
+| 10 | Test | Browser/email | Quên mật khẩu -> OTP -> reset -> login bằng password mới |
+
+**Ưu tiên:** Cao nếu muốn sản phẩm đầy đủ. Đây là tính năng rất thực tế.
+
+### API bổ sung 5 — Email Service
+
+**Không phải endpoint trực tiếp**, nhưng là hạ tầng cho OTP, welcome email, login notification, statement email.
+
+| # | Task | Cần thêm/sửa | Ghi chú |
+|---|---|---|---|
+| 1 | Thêm dependency mail | `pom.xml` | `spring-boot-starter-mail` |
+| 2 | Thêm config SMTP | `application.properties` | Dùng Gmail app password hoặc SMTP test |
+| 3 | Tạo service interface | `service/EmailService.java` | `sendEmail(to, subject, body)` |
+| 4 | Tạo service impl | `service/EmailServiceImpl.java` | Dùng `JavaMailSender` |
+| 5 | Tạo template method | `EmailServiceImpl` | OTP, welcome, login notification, statement |
+| 6 | Gọi email khi register | `UserServiceImpl` hoặc `UserController` | Gửi welcome email |
+| 7 | Test email | Inbox thật | Cần app password/config đúng |
+
+**Ưu tiên:** Phụ nhưng cần nếu làm OTP/reset password thật.
+
+### API bổ sung 6 — Send Bank Statement Email
+
+**Endpoint gốc:** `GET /api/account/send-statement`
+
+**Mục đích:** Gửi lịch sử giao dịch của account đang login về email user.
+
+| # | Task | Cần thêm/sửa | Ghi chú |
+|---|---|---|---|
+| 1 | Thêm method service | `TransactionService.java` | `sendBankStatementByEmail(String accountNumber)` |
+| 2 | Viết logic lấy transaction | `TransactionServiceImpl.java` | Dùng method history hiện có |
+| 3 | Format nội dung statement | `TransactionServiceImpl.java` hoặc `EmailServiceImpl` | Có amount/type/source/target/date/message |
+| 4 | Lấy email user | Qua `AccountRepository` hoặc `UserRepository` | Account -> User -> email |
+| 5 | Gửi email | `EmailService` | Cần API bổ sung 5 |
+| 6 | Thêm controller endpoint | `AccountController.java` | `GET /api/account/send-statement` |
+| 7 | Thêm frontend button | `transaction-history.component.html` | Button “Send statement” |
+| 8 | Test | Browser/email | Gọi API -> nhận email statement |
+
+**Ưu tiên:** Phụ. Làm sau Email Service.
+
+### API bổ sung 7 — Idempotency cho giao dịch
+
+**Mục đích:** Tránh user double click hoặc request lặp làm deposit/withdraw/transfer chạy 2 lần.
+
+| # | Task | Cần thêm/sửa | Ghi chú |
+|---|---|---|---|
+| 1 | Chọn cách làm | Cache hoặc DB key | Project gốc dùng `@Cacheable` |
+| 2 | Thêm cache config | `CacheConfig.java` | Có thể dùng Caffeine trước, Redis sau |
+| 3 | Thêm idempotency key | Header `Idempotency-Key` hoặc hash request | Header chuyên nghiệp hơn |
+| 4 | Bọc create PIN/update PIN | `AccountController.java` | Tránh submit lặp |
+| 5 | Bọc deposit/withdraw/transfer | `AccountController.java` hoặc service | Quan trọng nhất |
+| 6 | Frontend gửi key | `account.service.ts` | Sinh key cho mỗi submit |
+| 7 | Test double click | Browser/curl | Gửi cùng key 2 lần chỉ xử lý 1 lần |
+
+**Ưu tiên:** Cao cho phỏng vấn backend ngân hàng vì liên quan tính đúng đắn giao dịch.
+
+### API bổ sung 8 — Redis / Cache Config
+
+**Mục đích:** Hỗ trợ idempotency/OTP retry limit/session cache giống project gốc.
+
+| # | Task | Cần thêm/sửa | Ghi chú |
+|---|---|---|---|
+| 1 | Thêm dependency Redis | `pom.xml` | `spring-boot-starter-data-redis` |
+| 2 | Thêm Redis config | `config/RedisConfig.java` | Host/port/password nếu có |
+| 3 | Thêm cache manager | `config/CacheConfig.java` | TTL cho idempotency/otpAttempts |
+| 4 | Chạy Redis local | Docker hoặc Redis Windows | Cần hướng dẫn setup |
+| 5 | Kết nối idempotency/OTP | Service/controller | Dùng cache thật |
+| 6 | Test | curl/log | Cache hoạt động, TTL đúng |
+
+**Ưu tiên:** Phụ/hạ tầng. Nếu gấp, dùng Caffeine in-memory trước.
+
+### API bổ sung 9 — Geolocation Login Notification
+
+**Mục đích:** Khi login thành công, gửi email thông báo thời gian/vị trí đăng nhập.
+
+| # | Task | Cần thêm/sửa | Ghi chú |
+|---|---|---|---|
+| 1 | Lấy IP từ request | `HttpServletRequest` trong login | Cần truyền request vào service |
+| 2 | Tạo DTO geolocation | `dto/GeolocationResponse.java` | Country/city/ip |
+| 3 | Tạo service geolocation | `GeolocationService.java` | Gọi API ngoài hoặc mock |
+| 4 | Gửi email login notification | `EmailService` | Cần API bổ sung 5 |
+| 5 | Test | Login thật | Nếu không có network/API key thì mock location |
+
+**Ưu tiên:** Thấp. Hay để demo security awareness, nhưng không phải core.
+
+### API bổ sung 10 — Swagger/OpenAPI Docs
+
+**Endpoint tài liệu:** thường là `/swagger-ui/index.html`
+
+**Mục đích:** Có trang xem/test API khi phỏng vấn, không cần Postman.
+
+| # | Task | Cần thêm/sửa | Ghi chú |
+|---|---|---|---|
+| 1 | Thêm dependency OpenAPI | `pom.xml` | `springdoc-openapi-starter-webmvc-ui` |
+| 2 | Thêm config nếu cần | `config/SwaggerConfig.java` | Title, version, JWT Bearer security |
+| 3 | Permit Swagger routes | `WebSecurityConfig.java` | Cho phép `/swagger-ui/**`, `/v3/api-docs/**` |
+| 4 | Thêm mô tả endpoint | Controller annotations nếu muốn | Không bắt buộc |
+| 5 | Test | Browser | Mở Swagger UI và gọi API có Bearer token |
+
+**Ưu tiên:** Cao vì rất có ích khi demo phỏng vấn, làm nhanh hơn OTP/email.
+
+### Thứ tự làm khuyến nghị cho API còn thiếu
+
+| Thứ tự | Nhóm | Lý do |
+|---|---|---|
+| 1 | Swagger/OpenAPI | Nhanh, giúp demo API chuyên nghiệp |
+| 2 | Update User/Profile | Tính năng thật, ít rủi ro |
+| 3 | Logout backend | Hoàn thiện auth flow |
+| 4 | Idempotency giao dịch | Quan trọng với banking/backend interview |
+| 5 | Email Service | Nền cho OTP/reset/statement |
+| 6 | Forgot Password / Reset Password | Tính năng auth thực tế |
+| 7 | OTP Login | Mở rộng login, dùng lại OTP/email |
+| 8 | Send Bank Statement Email | Phụ, dùng lại email/history |
+| 9 | Redis/Cache Config | Làm sau khi idempotency/OTP đã rõ |
+| 10 | Geolocation login notification | Nice-to-have |
+
+### Cách làm từng API từ giờ trở đi
+
+Mỗi API mới sẽ làm theo format:
+
+```
+1. Đọc project gốc để hiểu endpoint và flow
+2. Tạo DTO request/response
+3. Tạo entity/repository nếu cần lưu DB
+4. Thêm method vào service interface
+5. Viết service impl
+6. Thêm controller endpoint
+7. Thêm frontend model/service/component nếu API có màn hình
+8. Test bằng curl/browser
+9. Note kết quả vào ROADMAP.md
+```
 
 ---
 
@@ -382,7 +656,7 @@ Route -> Component -> DTO/interface -> Service gọi API -> Logic trong componen
 | # | Feature | API backend | Mục đích | Trạng thái frontend |
 |---|---|---|---|---|
 | 1 | Register | `POST /api/users/register` | Đăng ký user + tự tạo account | ✅ |
-| 2 | Login | `POST /api/users/login` | Đăng nhập, nhận JWT | ⬜ |
+| 2 | Login | `POST /api/users/login` | Đăng nhập, nhận JWT | ✅ |
 | 3 | Dashboard user | `GET /api/dashboard/user` | Lấy thông tin user đang login | ✅ |
 | 4 | Dashboard account | `GET /api/dashboard/account` | Lấy thông tin account/số dư | ✅ |
 | 5 | Check PIN | `GET /api/account/pin/check` | Kiểm tra account đã có PIN chưa | ✅ |
@@ -390,8 +664,9 @@ Route -> Component -> DTO/interface -> Service gọi API -> Logic trong componen
 | 7 | Update PIN | `POST /api/account/pin/update` | Đổi PIN | ✅ |
 | 8 | Deposit | `POST /api/account/deposit` | Nạp/gửi tiền | ✅ |
 | 9 | Withdraw | `POST /api/account/withdraw` | Rút tiền | ✅ |
-| 10 | Transfer | `POST /api/account/fund-transfer` | Chuyển khoản | ✅ |
-| 11 | Transaction history | `GET /api/account/transactions` | Xem lịch sử giao dịch | ✅ |
+| 10 | Transfer | `POST /api/account/fund-transfer` | Chuyển khoản + lời nhắn | ✅ |
+| 11 | Transaction history | `GET /api/account/transactions` | Xem lịch sử giao dịch + lời nhắn | ✅ |
+| 12 | Recipient lookup | `GET /api/account/recipient` | Tra tên người nhận theo account number | ✅ |
 
 ### Checklist task frontend
 | # | Việc | File/thư mục | Trạng thái |
@@ -410,9 +685,9 @@ Route -> Component -> DTO/interface -> Service gọi API -> Logic trong componen
 | 12 | Làm PIN feature | `features/account` | ✅ form + route + gọi API |
 | 13 | Làm Deposit feature | `features/account` | ✅ form + route + gọi API |
 | 14 | Làm Withdraw feature | `features/account` | ✅ form + route + gọi API |
-| 15 | Làm Transfer feature | `features/account` | ✅ form + route + gọi API |
-| 16 | Làm Transaction history feature | `features/transactions` | ✅ bảng + route + gọi API |
-| 17 | Test full flow: register -> login -> dashboard -> PIN -> deposit -> withdraw -> transfer -> history | trình duyệt + backend thật | 🔄 smoke test OK, chờ test browser từng màn |
+| 15 | Làm Transfer feature | `features/account` | ✅ form + route + gọi API + tra người nhận + lời nhắn |
+| 16 | Làm Transaction history feature | `features/transactions` | ✅ bảng + route + gọi API + hiển thị lời nhắn |
+| 17 | Test full flow: register -> login -> dashboard -> PIN -> deposit -> withdraw -> transfer -> history | trình duyệt + backend thật | ✅ |
 
 **NOTE:** Login/register không cần JWT. Các API dashboard/account/transaction cần JWT, nên phải xong `AuthInterceptor` trước khi test những màn hình đó.
 
@@ -424,51 +699,61 @@ Route -> Component -> DTO/interface -> Service gọi API -> Logic trong componen
   - `GET /api/dashboard/user`
   - `GET /api/dashboard/account`
   - `GET /api/account/pin/check`
-  - `GET /api/account/transactions`
+- `GET /api/account/transactions`
+- `GET /api/account/recipient`
 - Lưu ý khi mở frontend: nên dùng `http://localhost:4200`, không dùng `127.0.0.1`, để khớp CORS backend hiện tại.
+
+### UI polish đã hoàn thiện
+
+- Login/Register đã sửa logo chữ `N`, font và layout đồng bộ.
+- Main layout có sidebar cố định, các màn con hiển thị qua `router-outlet`.
+- Sidebar dùng icon giống hướng UI gốc hơn, Account đặt dưới PIN theo yêu cầu.
+- Dashboard bỏ `Account Summary` riêng; tập trung vào lời chào, số dư, quick actions và recent activity.
+- Profile hiển thị thông tin user + account.
+- Account Info tách thành màn riêng.
+- PIN, Deposit, Withdraw, Fund Transfer, Transaction History đã căn lại width/card/form cho đồng nhất.
+- Transaction History bỏ cột ID, format tiền JPY, ngày giờ theo timezone local.
 
 ---
 
-## 🔄 Mục tiêu tiếp theo — Optimize API + polish UI
+## ✅ Mốc đã xong — Optimize 11 API + polish UI
 
-**Mục tiêu hiện tại:** 11 API chính đã chạy được end-to-end với frontend. Bước tiếp theo là tối ưu backend cho sạch/chuyên nghiệp hơn, rồi chỉnh frontend đẹp và sát UI gốc hơn.
+**Mục tiêu:** 11 API chính đã chạy được end-to-end với frontend, response/request đã đủ dùng cho UI, validation/transaction/security core đã ổn để demo.
 
 ### Backend — tối ưu 11 API hiện có
 | # | Việc | Mục đích | Trạng thái |
 |---|---|---|---|
-| 1 | Chuẩn hóa success response JSON | Không trả text rời rạc, thống nhất dạng `{ message, data }` | ⬜ |
-| 2 | Chuẩn hóa error response JSON | Không trả `"Loi server"` chung chung, có `status/message/path/timestamp` | ⬜ |
-| 3 | Thêm validation cho request DTO | Check `amount > 0`, `amount <= 10000000`, PIN/password không rỗng | ⬜ |
-| 4 | Đổi register không nhận trực tiếp entity `User` | Tạo `RegisterRequest`, tránh expose entity ra API | ⬜ |
-| 5 | Thêm `@Transactional` cho deposit/withdraw/transfer | Đảm bảo nghiệp vụ tiền và transaction history cùng thành công/thất bại | ⬜ |
-| 6 | Review lại HTTP status | Sai PIN 400, account không tồn tại 404, token lỗi 401/403 rõ ràng | ⬜ |
-| 7 | Tối ưu dashboard API nếu cần | Có thể gom user/account thành `GET /api/dashboard` sau khi cân nhắc frontend | ⬜ |
-| 8 | Cải thiện JWT/security message | Token sai/hết hạn trả lỗi dễ hiểu hơn | ⬜ |
-| 9 | Thêm Swagger/OpenAPI | Dễ demo API khi phỏng vấn | ⬜ |
-| 10 | Viết README chạy backend/frontend | Người khác clone về có thể chạy project | ⬜ |
-| 11 | Test full flow sau khi tối ưu | Đảm bảo 11 API không regression | ⬜ |
+| 1 | Chuẩn hóa response đủ dùng cho frontend | Login trả JSON token, dashboard/history trả DTO JSON | ✅ |
+| 2 | Chuẩn hóa error response cơ bản | Exception handler trả lỗi rõ cho validation/PIN/account/user | ✅ |
+| 3 | Thêm validation cho request DTO | Check amount, PIN/password không rỗng, giới hạn `10000000` | ✅ |
+| 4 | Đổi register không nhận trực tiếp entity `User` | Dùng `RegisterRequest` | ✅ |
+| 5 | Thêm `@Transactional` cho deposit/withdraw/transfer | Đảm bảo balance + transaction đi cùng nhau | ✅ |
+| 6 | Review lại HTTP status | Sai PIN/user invalid/account not found đã có status riêng | ✅ |
+| 7 | Dashboard API | Giữ tách `/dashboard/user` và `/dashboard/account` vì frontend dùng rõ ràng | ✅ |
+| 8 | JWT/security core | Login JWT + interceptor + guard chạy được | ✅ |
+| 9 | Thêm recipient lookup cho transfer | Hiển thị tên người nhận trước khi chuyển | ✅ |
+| 10 | Thêm message chuyển tiền | Lưu và hiển thị trong transaction history | ✅ |
+| 11 | Test full flow sau khi tối ưu | Backend compile + frontend build + browser manual test | ✅ |
 
 ### Frontend — polish giống UI gốc
 | # | Việc | Mục đích | Trạng thái |
 |---|---|---|---|
-| 1 | So sánh `BankingPortal-UI` gốc | Lấy lại style/layout tốt, không sửa UI gốc | ⬜ |
-| 2 | Chỉnh layout/sidebar/header | App sau login nhìn giống sản phẩm hơn | ⬜ |
-| 3 | Chỉnh Login/Register UI | Màn hình auth đẹp và đồng nhất | ⬜ |
-| 4 | Chỉnh Dashboard card/số dư/account info | Dashboard dễ đọc, nổi bật thông tin chính | ⬜ |
-| 5 | Chỉnh form PIN/deposit/withdraw/transfer | Form gọn, rõ trạng thái loading/success/error | ⬜ |
-| 6 | Chỉnh bảng transaction history | Dễ scan giao dịch, format ngày/tiền rõ hơn | ⬜ |
-| 7 | Format tiền/ngày | Hiển thị `400,000 VND`, ngày giờ dễ đọc | ⬜ |
-| 8 | Đồng bộ error message theo backend mới | Frontend hiện đúng message trả từ API | ⬜ |
-| 9 | Responsive mobile/tablet | UI không vỡ khi màn hình nhỏ | ⬜ |
-| 10 | Test full flow bằng browser thật | Register -> login -> dashboard -> PIN -> deposit -> withdraw -> transfer -> history | ⬜ |
+| 1 | So sánh `BankingPortal-UI` gốc | Lấy lại style/layout tốt, không sửa UI gốc | ✅ |
+| 2 | Chỉnh layout/sidebar/header | App sau login nhìn giống sản phẩm hơn | ✅ |
+| 3 | Chỉnh Login/Register UI | Màn hình auth đẹp và đồng nhất | ✅ |
+| 4 | Chỉnh Dashboard card/số dư/account info | Dashboard dễ đọc, nổi bật thông tin chính | ✅ |
+| 5 | Chỉnh form PIN/deposit/withdraw/transfer | Form gọn, rõ trạng thái loading/success/error | ✅ |
+| 6 | Chỉnh bảng transaction history | Dễ scan giao dịch, format ngày/tiền rõ hơn | ✅ |
+| 7 | Format tiền/ngày | Hiển thị JPY, ngày giờ local dễ đọc | ✅ |
+| 8 | Đồng bộ error message theo backend mới | Frontend hiện message hợp lý theo API | ✅ |
+| 9 | Responsive mobile/tablet cơ bản | UI không vỡ layout chính | ✅ |
+| 10 | Test full flow bằng browser thật | Register -> login -> dashboard -> PIN -> deposit -> withdraw -> transfer -> history | ✅ |
 
 ### Thứ tự làm khuyến nghị
 ```
-1. Tối ưu backend response/error/validation trước
-2. Sửa frontend service/component theo response backend mới
-3. Polish UI giống UI gốc
-4. Test full flow lại
-5. Viết README + chụp screenshot demo nếu cần
+1. Core API + frontend UI đã hoàn thiện.
+2. Bước tiếp theo nên làm README + screenshot demo.
+3. Sau đó chọn backlog phụ nếu còn thời gian: logout, update profile, OTP/reset password, email, Swagger, idempotency.
 ```
 
 ---

@@ -13,10 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.webapp.bankingportal.dto.PinRequest;
 import com.webapp.bankingportal.dto.PinStatusResponse;
 import com.webapp.bankingportal.dto.PinUpdateRequest;
+import com.webapp.bankingportal.dto.RecipientResponse;
 import com.webapp.bankingportal.dto.TransactionDTO;
 import com.webapp.bankingportal.dto.AmountRequest;
 import com.webapp.bankingportal.dto.FundTransferRequest;
@@ -83,8 +85,14 @@ public class AccountController {
                 LoggedinUser.getAccountNumber(),
                 fundTransferRequest.targetAccountNumber(),
                 fundTransferRequest.pin(),
-                fundTransferRequest.amount());
+                fundTransferRequest.amount(),
+                fundTransferRequest.message());
         return ResponseEntity.ok("Chuyển tiền thành công");
+    }
+
+    @GetMapping("/recipient")
+    public ResponseEntity<RecipientResponse> getRecipient(@RequestParam String accountNumber) {
+        return ResponseEntity.ok(accountService.getRecipient(accountNumber));
     }
 
     @GetMapping("/transactions")

@@ -10,4 +10,5 @@ export interface Transaction {
   transactionDate: string;
   sourceAccountNumber: string;
   targetAccountNumber: string;
+  message?: string;
 }
