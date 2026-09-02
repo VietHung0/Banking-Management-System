@@ -53,11 +53,16 @@ export class TransferComponent {
   }
 
   onSubmit(): void {
+    if (this.isLoading) {
+      return;
+    }
+
     this.successMessage = '';
     this.errorMessage = '';
     this.isLoading = true;
+    const idempotencyKey = this.accountService.createIdempotencyKey();
 
-    this.accountService.transfer(this.transferRequest).subscribe({
+    this.accountService.transfer(this.transferRequest, idempotencyKey).subscribe({
       next: (response) => {
         this.isLoading = false;
         this.successMessage = this.recipientName

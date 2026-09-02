@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -34,20 +34,23 @@ export class AccountService {
     });
   }
 
-  deposit(request: AmountRequest): Observable<string> {
+  deposit(request: AmountRequest, idempotencyKey: string): Observable<string> {
     return this.http.post(`${API_BASE_URL}/account/deposit`, request, {
+      headers: this.createIdempotencyHeaders(idempotencyKey),
       responseType: 'text'
     });
   }
 
-  withdraw(request: AmountRequest): Observable<string> {
+  withdraw(request: AmountRequest, idempotencyKey: string): Observable<string> {
     return this.http.post(`${API_BASE_URL}/account/withdraw`, request, {
+      headers: this.createIdempotencyHeaders(idempotencyKey),
       responseType: 'text'
     });
   }
 
-  transfer(request: FundTransferRequest): Observable<string> {
+  transfer(request: FundTransferRequest, idempotencyKey: string): Observable<string> {
     return this.http.post(`${API_BASE_URL}/account/fund-transfer`, request, {
+      headers: this.createIdempotencyHeaders(idempotencyKey),
       responseType: 'text'
     });
   }
@@ -55,6 +58,20 @@ export class AccountService {
   getRecipient(accountNumber: string): Observable<RecipientResponse> {
     return this.http.get<RecipientResponse>(`${API_BASE_URL}/account/recipient`, {
       params: { accountNumber }
+    });
+  }
+
+  createIdempotencyKey(): string {
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+      return crypto.randomUUID();
+    }
+
+    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  private createIdempotencyHeaders(idempotencyKey: string): HttpHeaders {
+    return new HttpHeaders({
+      'Idempotency-Key': idempotencyKey
     });
   }
 }

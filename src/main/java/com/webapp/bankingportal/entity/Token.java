@@ -34,6 +34,8 @@ public class Token {
     @NotNull
     private Date expiryAt;
 
+    private boolean revoked = false;
+
     @NotNull
     @ManyToOne
     @JoinColumn(name = "account_id")

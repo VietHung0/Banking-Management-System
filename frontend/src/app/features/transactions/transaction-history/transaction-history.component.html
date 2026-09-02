@@ -10,6 +10,31 @@
 <p class="status" *ngIf="isLoading">Đang tải giao dịch...</p>
 <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
+<section class="filter-card">
+  <label>
+    Type
+    <select name="type" [(ngModel)]="filter.type">
+      <option value="">All</option>
+      <option *ngFor="let type of transactionTypes" [value]="type">{{ type }}</option>
+    </select>
+  </label>
+
+  <label>
+    From date
+    <input type="date" name="fromDate" [(ngModel)]="filter.fromDate">
+  </label>
+
+  <label>
+    To date
+    <input type="date" name="toDate" [(ngModel)]="filter.toDate">
+  </label>
+
+  <div class="filter-actions">
+    <button type="button" (click)="loadTransactions()">Search</button>
+    <button type="button" class="secondary-button" (click)="clearFilter()">Clear</button>
+  </div>
+</section>
+
 <section class="table-card" *ngIf="!isLoading && !errorMessage">
   <p class="empty-state" *ngIf="transactions.length === 0">Chưa có giao dịch nào.</p>
 

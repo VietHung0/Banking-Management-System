@@ -25,11 +25,16 @@ export class DepositComponent {
   constructor(private accountService: AccountService) { }
 
   onSubmit(): void {
+    if (this.isLoading) {
+      return;
+    }
+
     this.successMessage = '';
     this.errorMessage = '';
     this.isLoading = true;
+    const idempotencyKey = this.accountService.createIdempotencyKey();
 
-    this.accountService.deposit(this.depositRequest).subscribe({
+    this.accountService.deposit(this.depositRequest, idempotencyKey).subscribe({
       next: (response) => {
         this.isLoading = false;
         this.successMessage = response;
@@ -38,9 +43,9 @@ export class DepositComponent {
           amount: 0
         };
       },
-      error: () => {
+      error: (error) => {
         this.isLoading = false;
-        this.errorMessage = 'Nạp tiền thất bại. Vui lòng kiểm tra lại PIN hoặc số tiền.';
+        this.errorMessage = error.error || 'Nạp tiền thất bại. Vui lòng kiểm tra lại PIN hoặc số tiền.';
       }
     });
   }

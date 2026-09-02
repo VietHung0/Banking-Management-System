@@ -46,6 +46,59 @@
   </section>
 
   <section class="home-grid">
+    <article class="chart-card">
+      <div class="recent-header">
+        <div>
+          <span>Transaction Overview</span>
+          <h2>Cash Flow</h2>
+        </div>
+        <div class="range-tabs">
+          <button type="button" [class.active]="selectedRange === 'THIS_MONTH'" (click)="changeRange('THIS_MONTH')">Month</button>
+          <button type="button" [class.active]="selectedRange === 'LAST_7_DAYS'" (click)="changeRange('LAST_7_DAYS')">7 Days</button>
+          <button type="button" [class.active]="selectedRange === 'ALL'" (click)="changeRange('ALL')">All</button>
+        </div>
+      </div>
+
+      <div class="cashflow-summary">
+        <div>
+          <span>Money In</span>
+          <strong>{{ moneyIn | currency:'JPY':'symbol':'1.0-0' }}</strong>
+        </div>
+        <div>
+          <span>Money Out</span>
+          <strong>{{ moneyOut | currency:'JPY':'symbol':'1.0-0' }}</strong>
+        </div>
+        <div>
+          <span>Net Change</span>
+          <strong [class.negative]="netChange < 0">{{ netChange | currency:'JPY':'symbol':'1.0-0' }}</strong>
+        </div>
+      </div>
+
+      <p class="empty-state" *ngIf="cashFlowRows.length === 0">Chưa có dữ liệu dòng tiền cho khoảng thời gian này.</p>
+
+      <div class="cashflow-chart" *ngIf="cashFlowRows.length > 0">
+        <div class="cashflow-row" *ngFor="let row of cashFlowRows">
+          <span class="cashflow-date">{{ row.date | date: 'MM/dd' }}</span>
+          <div class="cashflow-bars">
+            <div class="flow-line">
+              <span class="flow-label">In</span>
+              <div class="flow-track">
+                <span class="flow-fill in" [style.width.%]="row.inPercent"></span>
+              </div>
+              <strong>{{ row.moneyIn | currency:'JPY':'symbol':'1.0-0' }}</strong>
+            </div>
+            <div class="flow-line">
+              <span class="flow-label">Out</span>
+              <div class="flow-track">
+                <span class="flow-fill out" [style.width.%]="row.outPercent"></span>
+              </div>
+              <strong>{{ row.moneyOut | currency:'JPY':'symbol':'1.0-0' }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
     <article class="recent-card">
       <div class="recent-header">
         <div>

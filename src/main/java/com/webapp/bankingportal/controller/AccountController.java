@@ -1,11 +1,14 @@
 package com.webapp.bankingportal.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.webapp.bankingportal.service.AccountService;
+import com.webapp.bankingportal.service.IdempotencyService;
 import com.webapp.bankingportal.service.TransactionService;
 
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.webapp.bankingportal.dto.PinRequest;
@@ -33,6 +37,7 @@ public class AccountController {
 
     private final AccountService accountService;
     private final TransactionService transactionService;
+    private final IdempotencyService idempotencyService;
 
     @GetMapping("/pin/check")
     public ResponseEntity<PinStatusResponse> checkPin() {
@@ -62,32 +67,50 @@ public class AccountController {
     }
 
     @PostMapping("/deposit")
-    public ResponseEntity<String> cashDeposit(@Valid @RequestBody AmountRequest amountRequest) {
-        accountService.cashDeposit(
-                LoggedinUser.getAccountNumber(),
-                amountRequest.pin(),
-                amountRequest.amount());
-        return ResponseEntity.ok("Gửi tiền thành công");
+    public ResponseEntity<String> cashDeposit(
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
+            @Valid @RequestBody AmountRequest amountRequest) {
+        String accountNumber = LoggedinUser.getAccountNumber();
+        String response = idempotencyService.execute(idempotencyKey, accountNumber, "/api/account/deposit", () -> {
+            accountService.cashDeposit(
+                    accountNumber,
+                    amountRequest.pin(),
+                    amountRequest.amount());
+            return "Gửi tiền thành công";
+        });
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/withdraw")
-    public ResponseEntity<String> cashWithdrawal(@Valid @RequestBody AmountRequest amountRequest) {
-        accountService.cashWithdrawal(
-                LoggedinUser.getAccountNumber(),
-                amountRequest.pin(),
-                amountRequest.amount());
-        return ResponseEntity.ok("Rút tiền thành công");
+    public ResponseEntity<String> cashWithdrawal(
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
+            @Valid @RequestBody AmountRequest amountRequest) {
+        String accountNumber = LoggedinUser.getAccountNumber();
+        String response = idempotencyService.execute(idempotencyKey, accountNumber, "/api/account/withdraw", () -> {
+            accountService.cashWithdrawal(
+                    accountNumber,
+                    amountRequest.pin(),
+                    amountRequest.amount());
+            return "Rút tiền thành công";
+        });
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/fund-transfer")
-    public ResponseEntity<String> fundTransfer(@Valid @RequestBody FundTransferRequest fundTransferRequest) {
-        accountService.fundTransfer(
-                LoggedinUser.getAccountNumber(),
-                fundTransferRequest.targetAccountNumber(),
-                fundTransferRequest.pin(),
-                fundTransferRequest.amount(),
-                fundTransferRequest.message());
-        return ResponseEntity.ok("Chuyển tiền thành công");
+    public ResponseEntity<String> fundTransfer(
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
+            @Valid @RequestBody FundTransferRequest fundTransferRequest) {
+        String accountNumber = LoggedinUser.getAccountNumber();
+        String response = idempotencyService.execute(idempotencyKey, accountNumber, "/api/account/fund-transfer", () -> {
+            accountService.fundTransfer(
+                    accountNumber,
+                    fundTransferRequest.targetAccountNumber(),
+                    fundTransferRequest.pin(),
+                    fundTransferRequest.amount(),
+                    fundTransferRequest.message());
+            return "Chuyển tiền thành công";
+        });
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/recipient")
@@ -96,9 +119,15 @@ public class AccountController {
     }
 
     @GetMapping("/transactions")
-    public ResponseEntity<List<TransactionDTO>> getAllTransactionByAccountNumber() {
+    public ResponseEntity<List<TransactionDTO>> getAllTransactionByAccountNumber(
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
         return ResponseEntity.ok(
-                transactionService.getAllTransactionsByAccountNumber(
-                        LoggedinUser.getAccountNumber()));
+                transactionService.getTransactionsByFilter(
+                        LoggedinUser.getAccountNumber(),
+                        type,
+                        fromDate,
+                        toDate));
     }
 }

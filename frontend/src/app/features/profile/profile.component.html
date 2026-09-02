@@ -1,5 +1,6 @@
 <p class="status" *ngIf="isLoading">Đang tải profile...</p>
 <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+<p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
 
 <section class="profile-page" *ngIf="!isLoading && !errorMessage">
   <article class="profile-card">
@@ -9,9 +10,37 @@
         <h1>{{ user?.name }}</h1>
         <p>Customer Profile</p>
       </div>
+      <button type="button" *ngIf="!isEditing" (click)="startEdit()">Edit</button>
     </div>
 
-    <div class="profile-list">
+    <form class="edit-form" *ngIf="isEditing" (ngSubmit)="saveProfile()">
+      <label>
+        Name
+        <input type="text" name="name" [(ngModel)]="updateRequest.name" required>
+      </label>
+
+      <label>
+        Country Code
+        <input type="text" name="countryCode" [(ngModel)]="updateRequest.countryCode" required>
+      </label>
+
+      <label>
+        Phone Number
+        <input type="text" name="phoneNumber" [(ngModel)]="updateRequest.phoneNumber" required>
+      </label>
+
+      <label class="full-row">
+        Address
+        <input type="text" name="address" [(ngModel)]="updateRequest.address" required>
+      </label>
+
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="cancelEdit()">Cancel</button>
+        <button type="submit" [disabled]="isSaving">{{ isSaving ? 'Saving...' : 'Save changes' }}</button>
+      </div>
+    </form>
+
+    <div class="profile-list" *ngIf="!isEditing">
       <div>
         <span>Email</span>
         <strong>{{ user?.email }}</strong>

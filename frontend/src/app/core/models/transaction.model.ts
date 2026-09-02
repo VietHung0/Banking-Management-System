@@ -12,3 +12,9 @@ export interface Transaction {
   targetAccountNumber: string;
   message?: string;
 }
+
+export interface TransactionFilter {
+  type?: TransactionType | '';
+  fromDate?: string;
+  toDate?: string;
+}

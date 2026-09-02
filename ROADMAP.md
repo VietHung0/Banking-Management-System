@@ -412,13 +412,15 @@ Transaction History hiển thị cột Lời nhắn
 
 Các phần này chưa bắt buộc cho demo core, nhưng nếu muốn giống `BankingPortal-API` gốc đầy đủ hơn thì làm sau:
 
-- Logout API phía backend.
-- Update user/profile API.
+- Logout API phía backend. ✅ đã xong backend + UI gọi logout
+- Update user/profile API. ✅ đã xong backend + UI edit profile
+- Transaction filter/search. ✅ đã xong type/fromDate/toDate + UI filter
+- Dashboard transaction chart. ✅ đã xong biểu đồ cash flow
 - OTP login.
 - Forgot password/reset password bằng OTP.
 - Email service: welcome email, OTP email, login notification email.
 - Send bank statement email.
-- Cache/idempotency cho PIN/deposit/withdraw/transfer để tránh submit lặp.
+- Cache/idempotency cho deposit/withdraw/fund-transfer để tránh submit lặp. ✅ đã xong bản DB key
 - Redis/cache config.
 - Geolocation login notification.
 - Swagger/OpenAPI docs.
@@ -427,7 +429,7 @@ Các phần này chưa bắt buộc cho demo core, nhưng nếu muốn giống `
 
 **Mục tiêu:** Bổ sung các API/hạ tầng phụ còn thiếu để project mới tiến gần `BankingPortal-API` gốc hơn. Làm theo thứ tự dưới đây để không phá flow core đã ổn.
 
-### API bổ sung 1 — Logout
+### API bổ sung 1 — Logout ✅ ĐÃ XONG
 
 **Endpoint dự kiến:** `GET /api/users/logout`
 
@@ -435,17 +437,26 @@ Các phần này chưa bắt buộc cho demo core, nhưng nếu muốn giống `
 
 | # | Task | Cần thêm/sửa | Ghi chú |
 |---|---|---|---|
-| 1 | Kiểm tra `Token` entity hiện tại | `entity/Token.java` | Xem đã có token, expiry, account chưa |
-| 2 | Tạo `TokenRepository` nếu chưa có | `repository/TokenRepository.java` | Tìm token theo chuỗi JWT |
-| 3 | Thêm method logout | `service/AuthService` hoặc `UserService` | Nên để trong `AuthService` cho đúng nghiệp vụ auth |
-| 4 | Xử lý revoke/delete token | `service/AuthServiceImpl` | Cách đơn giản: delete token hoặc set expired |
-| 5 | Thêm controller endpoint | `controller/AuthController` hoặc `UserController` | Project gốc để `/api/users/logout`, project mới có thể cân nhắc `/api/auth/logout` |
-| 6 | Sửa frontend logout | `auth.service.ts`, `main-layout.component.ts` | Gọi API logout rồi xóa localStorage |
-| 7 | Test | Browser/curl | Login -> gọi API riêng -> token cũ không dùng được nếu có revoke |
+| 1 | Kiểm tra `Token` entity hiện tại | `entity/Token.java` | ✅ có token, expiry, account; đã thêm `revoked` |
+| 2 | Tạo `TokenRepository` nếu chưa có | `repository/TokenRepository.java` | ✅ thêm `findByToken(String token)` |
+| 3 | Thêm method logout | `service/AuthService` | ✅ đặt trong `AuthService` cho đúng nghiệp vụ auth |
+| 4 | Xử lý revoke/delete token | `service/AuthServiceImpl` | ✅ set `revoked = true` |
+| 5 | Thêm controller endpoint | `controller/AuthController` | ✅ `POST /api/auth/logout` |
+| 6 | Sửa frontend logout | `auth.service.ts`, `main-layout.component.ts` | ✅ gọi API logout rồi xóa localStorage |
+| 7 | Test | PowerShell/build | ✅ backend token cũ bị 403; frontend build success |
 
-**Ưu tiên:** Trung bình. Frontend hiện logout localStorage đã đủ demo, backend logout là điểm cộng.
+**Đã làm backend trong project mới:**
 
-### API bổ sung 2 — Update User/Profile
+- Login lưu JWT vào bảng `token`.
+- `Token` có thêm field `revoked`.
+- Logout nhận `Authorization: Bearer <jwt>` rồi set token đó `revoked = true`.
+- `JwtAuthenticationFilter` chỉ cho request đi tiếp nếu JWT hợp lệ và token trong DB còn active.
+- Token đã logout dù chưa hết hạn vẫn bị backend chặn.
+- Frontend bấm Logout sẽ gọi `POST /api/auth/logout`, sau đó xóa token localStorage và chuyển về `/login`.
+
+**Kết quả verify:** login lấy token -> `GET /api/dashboard/account` trả `200`; logout -> `200`; dùng lại token cũ gọi dashboard -> `403`; frontend `npm run build` success.
+
+### API bổ sung 2 — Update User/Profile ✅ ĐÃ XONG
 
 **Endpoint dự kiến:** `POST /api/users/update` hoặc `PUT /api/users/profile`
 
@@ -453,16 +464,31 @@ Các phần này chưa bắt buộc cho demo core, nhưng nếu muốn giống `
 
 | # | Task | Cần thêm/sửa | Ghi chú |
 |---|---|---|---|
-| 1 | Tạo DTO request | `dto/UpdateUserRequest.java` | Không nhận trực tiếp entity `User` |
-| 2 | Tạo DTO response nếu cần | `dto/UserResponse.java` | Có thể dùng lại `UserResponse` |
-| 3 | Thêm method service | `service/UserService.java` | `updateUser(String accountNumber, UpdateUserRequest request)` |
-| 4 | Viết logic update | `service/UserServiceImpl.java` | Lấy user từ `LoggedinUser.getAccountNumber()` rồi update field cho phép |
-| 5 | Validate dữ liệu | DTO + service | Email/phone nếu cho sửa thì phải check trùng |
-| 6 | Thêm controller endpoint | `controller/UserController.java` | API cần JWT |
-| 7 | Thêm frontend form edit profile | `features/profile` | Có thể làm sau backend |
-| 8 | Test | Browser/curl | Update xong reload profile thấy data mới |
+| 1 | Tạo DTO request | `dto/UpdateUserRequest.java` | ✅ không nhận trực tiếp entity `User` |
+| 2 | Tạo DTO response nếu cần | `dto/UserResponse.java` | ✅ dùng lại `UserResponse` |
+| 3 | Thêm method service | `service/UserService.java` | ✅ `updateUser(String accountNumber, UpdateUserRequest request)` |
+| 4 | Viết logic update | `service/UserServiceImpl.java` | ✅ lấy user từ `LoggedinUser.getAccountNumber()` rồi update field cho phép |
+| 5 | Validate dữ liệu | DTO + service | ✅ check field rỗng, phone trùng user khác |
+| 6 | Thêm controller endpoint | `controller/UserController.java` | ✅ API cần JWT |
+| 7 | Thêm frontend form edit profile | `features/profile` | ✅ có nút Edit/Cancel/Save |
+| 8 | Test | Browser/build | ✅ backend compile + frontend build + dev server rebuild |
 
-**Ưu tiên:** Cao. Đây là tính năng thực tế, dễ nói trong phỏng vấn.
+**Đã làm trong project mới:**
+
+- Backend:
+  - `POST /api/users/update`
+  - Request body: `name`, `countryCode`, `phoneNumber`, `address`
+  - Không cho sửa `email`, `password`, `accountNumber`, `balance`, `PIN`
+  - Dùng JWT để lấy account đang login bằng `LoggedinUser.getAccountNumber()`
+  - Trả về `UserResponse` mới sau khi update
+
+- Frontend:
+  - Profile có nút `Edit`
+  - Form sửa `name`, `countryCode`, `phoneNumber`, `address`
+  - Có `Cancel`, `Save changes`, loading, success/error message
+  - Tạo `UserService.updateProfile()`
+
+**Kết quả verify:** `mvnw.cmd compile` success, `npm run build` success, Angular dev server đã rebuild/reload.
 
 ### API bổ sung 3 — OTP Login
 
@@ -548,23 +574,78 @@ Các phần này chưa bắt buộc cho demo core, nhưng nếu muốn giống `
 
 **Ưu tiên:** Phụ. Làm sau Email Service.
 
-### API bổ sung 7 — Idempotency cho giao dịch
+### API bổ sung 7 — Idempotency cho giao dịch ✅ ĐÃ XONG BẢN DB KEY
 
 **Mục đích:** Tránh user double click hoặc request lặp làm deposit/withdraw/transfer chạy 2 lần.
 
 | # | Task | Cần thêm/sửa | Ghi chú |
 |---|---|---|---|
-| 1 | Chọn cách làm | Cache hoặc DB key | Project gốc dùng `@Cacheable` |
-| 2 | Thêm cache config | `CacheConfig.java` | Có thể dùng Caffeine trước, Redis sau |
-| 3 | Thêm idempotency key | Header `Idempotency-Key` hoặc hash request | Header chuyên nghiệp hơn |
-| 4 | Bọc create PIN/update PIN | `AccountController.java` | Tránh submit lặp |
-| 5 | Bọc deposit/withdraw/transfer | `AccountController.java` hoặc service | Quan trọng nhất |
-| 6 | Frontend gửi key | `account.service.ts` | Sinh key cho mỗi submit |
-| 7 | Test double click | Browser/curl | Gửi cùng key 2 lần chỉ xử lý 1 lần |
+| 1 | Chọn cách làm | DB key | ✅ chưa dùng Redis, lưu key vào DB trước |
+| 2 | Tạo entity idempotency | `entity/IdempotencyKey.java` | ✅ lưu key/account/endpoint/response/createdAt |
+| 3 | Tạo repository | `repository/IdempotencyKeyRepository.java` | ✅ tìm theo `idempotencyKey + accountNumber + endpoint` |
+| 4 | Tạo service | `service/IdempotencyService.java`, `IdempotencyServiceImpl.java` | ✅ check key cũ hoặc execute action mới |
+| 5 | Thêm idempotency header | `AccountController.java` | ✅ `@RequestHeader("Idempotency-Key")` |
+| 6 | Bọc deposit/withdraw/transfer | `AccountController.java` | ✅ 3 API giao dịch tiền đã bọc |
+| 7 | Frontend gửi key | `account.service.ts` | ✅ sinh key bằng `crypto.randomUUID()` |
+| 8 | Component chống double submit | deposit/withdraw/transfer component | ✅ nếu `isLoading` thì return |
+| 9 | Test double request cùng key | PowerShell/curl | ✅ gửi deposit 2 lần cùng key, balance chỉ tăng 1 lần |
 
-**Ưu tiên:** Cao cho phỏng vấn backend ngân hàng vì liên quan tính đúng đắn giao dịch.
+**Đã làm trong project mới:**
 
-### API bổ sung 8 — Redis / Cache Config
+- Thêm bảng `idempotency_key`.
+- Thêm unique constraint cho bộ `idempotencyKey + accountNumber + endpoint`.
+- Nếu request không có key thì backend vẫn xử lý bình thường.
+- Nếu request có key mới thì backend xử lý giao dịch, lưu response message.
+- Nếu request gửi lại cùng key/account/endpoint thì backend trả message cũ và không chạy lại nghiệp vụ tiền.
+- Frontend tự sinh `Idempotency-Key` khi submit deposit/withdraw/fund-transfer.
+- CORS backend đã allow header `Idempotency-Key`, tránh lỗi browser chặn deposit/withdraw/transfer.
+- Deposit UI đã chỉnh `min=100`, `step=100` và hiện lỗi thật từ backend nếu sai PIN/số tiền.
+
+**Kết quả verify:** deposit cùng `Idempotency-Key` 2 lần: `before=400000`, `after=400100`, `increased=100`; nghĩa là không bị cộng tiền 2 lần.
+
+**NOTE:** Hiện mới áp dụng cho 3 API tiền: deposit, withdraw, fund-transfer. PIN create/update có thể thêm sau nếu muốn giống project gốc hơn.
+
+### API bổ sung 8 — Transaction filter/search ✅ ĐÃ XONG
+
+**Endpoint:** `GET /api/account/transactions`
+
+**Mục đích:** User có thể lọc lịch sử giao dịch theo loại giao dịch và khoảng ngày, giống luồng transaction history thực tế của web banking.
+
+| # | Task | Cần thêm/sửa | Ghi chú |
+|---|---|---|---|
+| 1 | Giữ endpoint history cũ | `AccountController.java` | ✅ không tạo route mới, chỉ thêm optional params |
+| 2 | Thêm query params | `type`, `fromDate`, `toDate` | ✅ không truyền thì trả tất cả như cũ |
+| 3 | Thêm method service filter | `TransactionService.java`, `TransactionServiceImpl.java` | ✅ lọc theo type và ngày |
+| 4 | Sửa frontend service | `transaction.service.ts` | ✅ gửi params nếu user chọn filter |
+| 5 | Thêm model filter | `transaction.model.ts` | ✅ `TransactionFilter` |
+| 6 | Thêm UI filter | `transaction-history.component.*` | ✅ Type, From date, To date, Search, Clear |
+| 7 | Test backend | PowerShell/curl | ✅ `all=4`, `deposit=2`, `depositTypes=CASH_DEPOSIT` |
+| 8 | Test frontend build | Angular build/dev server | ✅ build success, dev server rebuild |
+
+**Cách dùng API:**
+
+```
+GET /api/account/transactions
+GET /api/account/transactions?type=CASH_DEPOSIT
+GET /api/account/transactions?fromDate=2026-09-01&toDate=2026-09-02
+GET /api/account/transactions?type=CASH_TRANSFER&fromDate=2026-09-01&toDate=2026-09-02
+```
+
+### UI bổ sung — Dashboard transaction chart ✅ ĐÃ XONG
+
+**Mục đích:** Dashboard không chỉ hiển thị số dư và recent transactions, mà có thêm biểu đồ cash flow giống dashboard ngân hàng thực tế.
+
+| # | Task | Cần thêm/sửa | Ghi chú |
+|---|---|---|---|
+| 1 | Tính dòng tiền theo kỳ | `dashboard.component.ts` | ✅ Month / 7 Days / All |
+| 2 | Tách Money In / Money Out | `dashboard.component.ts` | ✅ Deposit là tiền vào, Withdraw/Transfer là tiền ra |
+| 3 | Thêm thông tin tổng quan | `dashboard.component.html` | ✅ Money In, Money Out, Net Change, số giao dịch, khoản chi lớn nhất |
+| 4 | Thêm biểu đồ theo ngày | `dashboard.component.html/css` | ✅ mỗi ngày có thanh In/Out dễ đọc như dashboard ngân hàng |
+| 5 | Giữ recent activity | Dashboard UI | ✅ chart nằm cạnh latest transactions |
+
+**NOTE:** Chart hiện dùng HTML/CSS để nhẹ project. Hướng đúng hiện tại là cash-flow banking dashboard: xem tiền vào, tiền ra, biến động ròng theo thời gian. Sau này nếu muốn đẹp/pro hơn có thể nâng cấp sang Chart.js hoặc ngx-charts.
+
+### API bổ sung 9 — Redis / Cache Config
 
 **Mục đích:** Hỗ trợ idempotency/OTP retry limit/session cache giống project gốc.
 
@@ -579,7 +660,7 @@ Các phần này chưa bắt buộc cho demo core, nhưng nếu muốn giống `
 
 **Ưu tiên:** Phụ/hạ tầng. Nếu gấp, dùng Caffeine in-memory trước.
 
-### API bổ sung 9 — Geolocation Login Notification
+### API bổ sung 10 — Geolocation Login Notification
 
 **Mục đích:** Khi login thành công, gửi email thông báo thời gian/vị trí đăng nhập.
 
@@ -593,7 +674,7 @@ Các phần này chưa bắt buộc cho demo core, nhưng nếu muốn giống `
 
 **Ưu tiên:** Thấp. Hay để demo security awareness, nhưng không phải core.
 
-### API bổ sung 10 — Swagger/OpenAPI Docs
+### API bổ sung 11 — Swagger/OpenAPI Docs
 
 **Endpoint tài liệu:** thường là `/swagger-ui/index.html`
 

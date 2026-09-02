@@ -11,3 +11,10 @@ export interface UserResponse {
   branch: string;
   accountType: string;
 }
+
+export interface UpdateUserRequest {
+  name: string;
+  countryCode: string;
+  phoneNumber: string;
+  address: string;
+}

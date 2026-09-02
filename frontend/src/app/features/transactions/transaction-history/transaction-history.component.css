@@ -37,6 +37,55 @@ button {
   padding: 0 16px;
 }
 
+.filter-card {
+  align-items: end;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1.2fr 1fr 1fr auto;
+  margin: 0 auto 20px;
+  max-width: 980px;
+  padding: 18px;
+}
+
+label {
+  color: #334155;
+  display: grid;
+  font-size: 13px;
+  font-weight: 800;
+  gap: 8px;
+}
+
+input,
+select {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: var(--ink);
+  font-size: 14px;
+  min-height: 40px;
+  padding: 0 10px;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--brand-red);
+  outline: 3px solid rgba(213, 0, 28, 0.14);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.secondary-button {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+}
+
 .table-card,
 .status,
 .error-message {
@@ -103,6 +152,10 @@ tbody tr:last-child td {
 }
 
 @media (max-width: 860px) {
+  .filter-card {
+    grid-template-columns: 1fr;
+  }
+
   .table-card {
     overflow-x: auto;
   }

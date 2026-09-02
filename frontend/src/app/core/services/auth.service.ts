@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, finalize, tap } from 'rxjs';
 
 import { API_BASE_URL, TOKEN_KEY } from '../config/api.config';
 import { LoginRequest, LoginResponse, RegisterRequest } from '../models/auth.model';
@@ -31,7 +31,15 @@ export class AuthService {
     return localStorage.getItem(TOKEN_KEY);
   }
 
-  logout(): void {
+  logout(): Observable<string> {
+    return this.http.post(`${API_BASE_URL}/auth/logout`, null, {
+      responseType: 'text'
+    }).pipe(
+      finalize(() => this.clearToken())
+    );
+  }
+
+  clearToken(): void {
     localStorage.removeItem(TOKEN_KEY);
   }
 

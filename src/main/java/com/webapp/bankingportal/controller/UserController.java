@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.webapp.bankingportal.dto.LoginRequest;
 import com.webapp.bankingportal.dto.LoginResponse;
 import com.webapp.bankingportal.dto.RegisterRequest;
+import com.webapp.bankingportal.dto.UpdateUserRequest;
+import com.webapp.bankingportal.dto.UserResponse;
 import com.webapp.bankingportal.service.AuthService;
 import com.webapp.bankingportal.service.UserService;
+import com.webapp.bankingportal.util.LoggedinUser;
 
 import jakarta.validation.Valid;
 
@@ -33,5 +36,10 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<UserResponse> updateUser(@Valid @RequestBody UpdateUserRequest request) {
+        return ResponseEntity.ok(userService.updateUser(LoggedinUser.getAccountNumber(), request));
     }
 }

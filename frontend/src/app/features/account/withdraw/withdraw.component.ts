@@ -25,11 +25,16 @@ export class WithdrawComponent {
   constructor(private accountService: AccountService) {}
 
   onSubmit(): void {
+    if (this.isLoading) {
+      return;
+    }
+
     this.successMessage = '';
     this.errorMessage = '';
     this.isLoading = true;
+    const idempotencyKey = this.accountService.createIdempotencyKey();
 
-    this.accountService.withdraw(this.withdrawRequest).subscribe({
+    this.accountService.withdraw(this.withdrawRequest, idempotencyKey).subscribe({
       next: (response) => {
         this.isLoading = false;
         this.successMessage = response;

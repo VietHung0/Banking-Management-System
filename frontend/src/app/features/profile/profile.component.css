@@ -6,6 +6,7 @@
 
 .profile-card,
 .status,
+.success-message,
 .error-message {
   background: #ffffff;
   border: 1px solid var(--line);
@@ -21,6 +22,10 @@
   gap: 16px;
   margin-bottom: 22px;
   padding-bottom: 20px;
+}
+
+.profile-header button {
+  margin-left: auto;
 }
 
 .profile-header > span {
@@ -81,7 +86,78 @@ p,
   color: #b91c1c;
 }
 
+.success-message {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+  color: #047857;
+  margin: 0 auto 16px;
+  max-width: 980px;
+}
+
+.edit-form {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+label {
+  color: #334155;
+  display: grid;
+  font-size: 14px;
+  font-weight: 700;
+  gap: 8px;
+}
+
+.full-row {
+  grid-column: 1 / -1;
+}
+
+input {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: var(--ink);
+  font-size: 15px;
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+input:focus {
+  border-color: var(--brand-red);
+  outline: 3px solid rgba(213, 0, 28, 0.14);
+}
+
+button {
+  background: var(--brand-red);
+  border: 0;
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 800;
+  min-height: 40px;
+  padding: 0 16px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.secondary-button {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+}
+
 @media (max-width: 760px) {
+  .edit-form,
   .profile-list {
     grid-template-columns: 1fr;
   }
