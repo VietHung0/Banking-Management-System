@@ -41,7 +41,6 @@ public class Token {
     @JoinColumn(name = "account_id")
     private Account account;
 
-    // Constructor để tạo Token từ JWT (dùng ở Giai đoạn 4 - Login + JWT)
     public Token(String token, Date expiryAt, Account account) {
         this.token = token;
         this.expiryAt = expiryAt;

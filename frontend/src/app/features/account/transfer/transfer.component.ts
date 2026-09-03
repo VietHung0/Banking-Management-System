@@ -47,7 +47,7 @@ export class TransferComponent {
       },
       error: () => {
         this.isCheckingRecipient = false;
-        this.recipientMessage = 'Không tìm thấy tài khoản nhận.';
+        this.recipientMessage = '振込先口座が見つかりません。';
       }
     });
   }
@@ -59,6 +59,13 @@ export class TransferComponent {
 
     this.successMessage = '';
     this.errorMessage = '';
+    this.transferRequest.targetAccountNumber = this.transferRequest.targetAccountNumber.trim();
+
+    if (!this.isValidTransferAmount()) {
+      this.errorMessage = '振込は1円以上、1,000,000円以下で入力してください。';
+      return;
+    }
+
     this.isLoading = true;
     const idempotencyKey = this.accountService.createIdempotencyKey();
 
@@ -66,8 +73,8 @@ export class TransferComponent {
       next: (response) => {
         this.isLoading = false;
         this.successMessage = this.recipientName
-          ? `${response} tới ${this.recipientName}.`
-          : response;
+          ? `${this.recipientName} さまへの振込が完了しました。`
+          : '振込が完了しました。';
         this.transferRequest = {
           targetAccountNumber: '',
           pin: '',
@@ -79,8 +86,13 @@ export class TransferComponent {
       },
       error: () => {
         this.isLoading = false;
-        this.errorMessage = 'Chuyển khoản thất bại. Vui lòng kiểm tra tài khoản nhận, PIN hoặc số dư.';
+        this.errorMessage = '振込できませんでした。振込先口座、暗証番号、残高、または1日の上限をご確認ください。';
       }
     });
+  }
+
+  private isValidTransferAmount(): boolean {
+    const amount = this.transferRequest.amount;
+    return amount >= 1 && amount <= 1000000 && amount % 1 === 0;
   }
 }

@@ -1,18 +1,18 @@
 <section class="page-header">
   <div>
-    <h1>Transfer</h1>
-    <p>Chuyển tiền sang tài khoản khác.</p>
+    <h1>振込</h1>
+    <p>他の口座へ資金を振り込みます。</p>
   </div>
 </section>
 
 <section class="work-panel">
   <article class="form-card">
-    <span class="card-label">Fund Transfer</span>
-    <h2>Thông tin chuyển khoản</h2>
+    <span class="card-label">振込手続き</span>
+    <h2>振込内容</h2>
 
     <form (ngSubmit)="onSubmit()">
       <label>
-        Số tài khoản nhận
+        振込先口座番号
         <input
           type="text"
           name="targetAccountNumber"
@@ -22,26 +22,27 @@
         >
       </label>
 
-      <p class="lookup-message" *ngIf="isCheckingRecipient">Đang kiểm tra tài khoản nhận...</p>
+      <p class="lookup-message" *ngIf="isCheckingRecipient">振込先口座を確認中...</p>
       <p class="recipient-message" *ngIf="recipientName">
-        Người nhận: <strong>{{ recipientName }}</strong>
+        受取人名: <strong>{{ recipientName }}</strong>
       </p>
       <p class="error-message" *ngIf="recipientMessage">{{ recipientMessage }}</p>
 
       <label>
-        Số tiền
+        金額
         <input
           type="number"
           name="amount"
           min="1"
-          max="10000000"
+          max="1000000"
+          step="1"
           [(ngModel)]="transferRequest.amount"
           required
         >
       </label>
 
       <label>
-        PIN
+        暗証番号
         <input
           type="password"
           name="pin"
@@ -51,13 +52,13 @@
       </label>
 
       <label>
-        Lời nhắn
+        メッセージ
         <textarea
           name="message"
           rows="3"
           maxlength="120"
           [(ngModel)]="transferRequest.message"
-          placeholder="Ví dụ: Chuyển tiền tháng 8"
+          placeholder="例: 8月分のお支払い"
         ></textarea>
       </label>
 
@@ -65,14 +66,15 @@
       <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
       <button type="submit" [disabled]="isLoading">
-        {{ isLoading ? 'Đang xử lý...' : 'Chuyển khoản' }}
+        {{ isLoading ? '処理中...' : '振込する' }}
       </button>
     </form>
   </article>
 
   <aside class="guide-card">
-    <h2>Lưu ý chuyển khoản</h2>
-    <p>Kiểm tra đúng số tài khoản nhận trước khi xác nhận.</p>
-    <p>Số tiền mỗi lần giao dịch không vượt quá ¥10,000,000.</p>
+    <h2>振込時のご注意</h2>
+    <p>振込前に受取人名と口座番号をご確認ください。</p>
+    <p>振込は1円以上から入力できます。</p>
+    <p>1日あたりの振込上限は1,000,000円です。</p>
   </aside>
 </section>

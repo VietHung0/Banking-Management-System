@@ -1,44 +1,44 @@
-<p class="status" *ngIf="isLoading">Đang tải thông tin tài khoản...</p>
+<p class="status" *ngIf="isLoading">口座情報を読み込み中...</p>
 <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
 <section class="account-page" *ngIf="!isLoading && !errorMessage">
   <article class="balance-card">
-    <span>Main Account</span>
+    <span>代表口座</span>
     <h1>{{ account?.balance | currency:'JPY':'symbol':'1.0-0' }}</h1>
-    <p>Available balance</p>
+    <p>ご利用可能残高</p>
   </article>
 
   <article class="detail-card">
-    <h2>Accounts & Cards</h2>
+    <h2>口座・カード情報</h2>
 
     <div class="detail-list">
       <div>
-        <span>Account Number</span>
+        <span>口座番号</span>
         <strong>{{ account?.accountNumber }}</strong>
       </div>
       <div>
-        <span>Account Type</span>
-        <strong>{{ account?.accountType }}</strong>
+        <span>口座種別</span>
+        <strong>{{ getAccountTypeLabel(account?.accountType) }}</strong>
       </div>
       <div>
-        <span>Bank Code</span>
+        <span>金融機関コード</span>
         <strong>{{ account?.bankCode }}</strong>
       </div>
       <div>
-        <span>Bank Address</span>
+        <span>金融機関住所</span>
         <strong>{{ account?.bankAddress }}</strong>
       </div>
       <div>
-        <span>Branch</span>
+        <span>支店名</span>
         <strong>{{ account?.branch }}</strong>
       </div>
       <div>
-        <span>Branch Code</span>
+        <span>支店コード</span>
         <strong>{{ account?.branchCode }}</strong>
       </div>
       <div>
-        <span>Status</span>
-        <strong>{{ account?.accountStatus }}</strong>
+        <span>口座ステータス</span>
+        <strong>{{ getAccountStatusLabel(account?.accountStatus) }}</strong>
       </div>
     </div>
   </article>

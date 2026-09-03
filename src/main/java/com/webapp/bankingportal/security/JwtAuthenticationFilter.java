@@ -14,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
+import io.jsonwebtoken.JwtException;
+
 import java.io.IOException;
 
 @Component
@@ -38,7 +40,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
-        accountNumber = jwtUtil.extractUsername(jwt);
+
+        try {
+            accountNumber = jwtUtil.extractUsername(jwt);
+        } catch (JwtException | IllegalArgumentException ex) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (accountNumber != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.tokenService.loadUserByUsername(accountNumber);

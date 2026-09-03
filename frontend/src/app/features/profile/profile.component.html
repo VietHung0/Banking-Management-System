@@ -1,4 +1,4 @@
-<p class="status" *ngIf="isLoading">Đang tải profile...</p>
+<p class="status" *ngIf="isLoading">お客さま情報を読み込み中...</p>
 <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
 
@@ -8,74 +8,74 @@
       <span>{{ user?.name?.charAt(0) || 'U' }}</span>
       <div>
         <h1>{{ user?.name }}</h1>
-        <p>Customer Profile</p>
+        <p>お客さま情報</p>
       </div>
-      <button type="button" *ngIf="!isEditing" (click)="startEdit()">Edit</button>
+      <button type="button" *ngIf="!isEditing" (click)="startEdit()">変更</button>
     </div>
 
     <form class="edit-form" *ngIf="isEditing" (ngSubmit)="saveProfile()">
       <label>
-        Name
+        お名前
         <input type="text" name="name" [(ngModel)]="updateRequest.name" required>
       </label>
 
       <label>
-        Country Code
+        国番号
         <input type="text" name="countryCode" [(ngModel)]="updateRequest.countryCode" required>
       </label>
 
       <label>
-        Phone Number
+        電話番号
         <input type="text" name="phoneNumber" [(ngModel)]="updateRequest.phoneNumber" required>
       </label>
 
       <label class="full-row">
-        Address
+        ご住所
         <input type="text" name="address" [(ngModel)]="updateRequest.address" required>
       </label>
 
       <div class="form-actions">
-        <button type="button" class="secondary-button" (click)="cancelEdit()">Cancel</button>
-        <button type="submit" [disabled]="isSaving">{{ isSaving ? 'Saving...' : 'Save changes' }}</button>
+        <button type="button" class="secondary-button" (click)="cancelEdit()">キャンセル</button>
+        <button type="submit" [disabled]="isSaving">{{ isSaving ? '保存中...' : '変更を保存' }}</button>
       </div>
     </form>
 
     <div class="profile-list" *ngIf="!isEditing">
       <div>
-        <span>Email</span>
+        <span>メールアドレス</span>
         <strong>{{ user?.email }}</strong>
       </div>
       <div>
-        <span>Phone Number</span>
+        <span>電話番号</span>
         <strong>{{ user?.countryCode }} {{ user?.phoneNumber }}</strong>
       </div>
       <div>
-        <span>Address</span>
+        <span>ご住所</span>
         <strong>{{ user?.address }}</strong>
       </div>
       <div>
-        <span>Account Number</span>
+        <span>口座番号</span>
         <strong>{{ user?.accountNumber }}</strong>
       </div>
       <div>
-        <span>Bank Code</span>
+        <span>金融機関コード</span>
         <strong>{{ user?.bankCode }}</strong>
       </div>
       <div>
-        <span>Bank Address</span>
+        <span>金融機関住所</span>
         <strong>{{ user?.bankAddress }}</strong>
       </div>
       <div>
-        <span>Branch</span>
+        <span>支店名</span>
         <strong>{{ user?.branch }}</strong>
       </div>
       <div>
-        <span>Branch Code</span>
+        <span>支店コード</span>
         <strong>{{ user?.branchCode }}</strong>
       </div>
       <div>
-        <span>Account Type</span>
-        <strong>{{ user?.accountType }}</strong>
+        <span>口座種別</span>
+        <strong>{{ getAccountTypeLabel(user?.accountType) }}</strong>
       </div>
     </div>
   </article>

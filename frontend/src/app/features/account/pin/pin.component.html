@@ -1,7 +1,7 @@
 <section class="page-header">
   <div>
-    <h1>PIN</h1>
-    <p>Quản lý mã PIN dùng để xác nhận giao dịch.</p>
+    <h1>暗証番号</h1>
+    <p>お取引時に使用する暗証番号を管理します。</p>
   </div>
 </section>
 
@@ -12,50 +12,50 @@
 
 <section class="form-grid">
   <article class="form-card">
-    <span class="card-label">First setup</span>
-    <h2>Tạo PIN</h2>
-    <p class="card-note">Dùng khi tài khoản chưa có PIN giao dịch.</p>
+    <span class="card-label">初回設定</span>
+    <h2>暗証番号登録</h2>
+    <p class="card-note">取引用の暗証番号が未登録の場合に設定します。</p>
 
     <form (ngSubmit)="createPin()">
       <label>
-        PIN mới
+        新しい暗証番号
         <input type="password" name="createPin" [(ngModel)]="createPinRequest.pin" required>
       </label>
 
       <label>
-        Mật khẩu đăng nhập
+        WEBログインパスワード
         <input type="password" name="createPassword" [(ngModel)]="createPinRequest.password" required>
       </label>
 
       <button type="submit" [disabled]="isLoading || hasPin">
-        {{ isLoading ? 'Đang xử lý...' : 'Tạo PIN' }}
+        {{ isLoading ? '処理中...' : '登録する' }}
       </button>
     </form>
   </article>
 
   <article class="form-card">
-    <span class="card-label">Security</span>
-    <h2>Đổi PIN</h2>
-    <p class="card-note">Dùng khi bạn muốn thay đổi PIN hiện tại.</p>
+    <span class="card-label">セキュリティ</span>
+    <h2>暗証番号変更</h2>
+    <p class="card-note">現在の暗証番号を変更する場合に利用します。</p>
 
     <form (ngSubmit)="updatePin()">
       <label>
-        PIN cũ
+        現在の暗証番号
         <input type="password" name="oldPin" [(ngModel)]="updatePinRequest.oldPin" required>
       </label>
 
       <label>
-        PIN mới
+        新しい暗証番号
         <input type="password" name="newPin" [(ngModel)]="updatePinRequest.newPin" required>
       </label>
 
       <label>
-        Mật khẩu đăng nhập
+        WEBログインパスワード
         <input type="password" name="updatePassword" [(ngModel)]="updatePinRequest.password" required>
       </label>
 
       <button type="submit" [disabled]="isLoading || !hasPin">
-        {{ isLoading ? 'Đang xử lý...' : 'Đổi PIN' }}
+        {{ isLoading ? '処理中...' : '変更する' }}
       </button>
     </form>
   </article>

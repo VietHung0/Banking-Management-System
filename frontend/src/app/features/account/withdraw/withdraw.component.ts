@@ -31,13 +31,19 @@ export class WithdrawComponent {
 
     this.successMessage = '';
     this.errorMessage = '';
+
+    if (!this.isValidWithdrawAmount()) {
+      this.errorMessage = '出金は1,000円以上、500,000円以下、1,000円単位で入力してください。';
+      return;
+    }
+
     this.isLoading = true;
     const idempotencyKey = this.accountService.createIdempotencyKey();
 
     this.accountService.withdraw(this.withdrawRequest, idempotencyKey).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.successMessage = response;
+        this.successMessage = '出金が完了しました。';
         this.withdrawRequest = {
           pin: '',
           amount: 0
@@ -45,8 +51,13 @@ export class WithdrawComponent {
       },
       error: () => {
         this.isLoading = false;
-        this.errorMessage = 'Rút tiền thất bại. Vui lòng kiểm tra lại PIN, số tiền hoặc số dư.';
+        this.errorMessage = '出金できませんでした。暗証番号、金額、残高、または1日の上限をご確認ください。';
       }
     });
+  }
+
+  private isValidWithdrawAmount(): boolean {
+    const amount = this.withdrawRequest.amount;
+    return amount >= 1000 && amount <= 500000 && amount % 1000 === 0;
   }
 }

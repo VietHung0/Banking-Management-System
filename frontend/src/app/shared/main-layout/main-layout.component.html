@@ -2,49 +2,49 @@
   <aside class="sidebar">
     <div class="brand">
       <span class="brand-mark">N</span>
-      <span>NetBank Demo</span>
+      <span>ネット銀行デモ</span>
     </div>
 
     <a class="user-card" routerLink="/profile" routerLinkActive="active-profile">
       <span class="avatar">{{ getInitials() }}</span>
       <span>
-        <strong>{{ user?.name || 'User' }}</strong>
-        <small>My profile</small>
+        <strong>{{ user?.name || 'お客さま' }}</strong>
+        <small>お客さま情報</small>
       </span>
     </a>
 
     <nav>
       <a routerLink="/dashboard" routerLinkActive="active">
         <i class="fas fa-tachometer-alt nav-icon"></i>
-        Dashboard
+        ホーム
       </a>
       <a routerLink="/account/deposit" routerLinkActive="active">
         <i class="fas fa-money-bill-wave nav-icon"></i>
-        Deposit
+        入金
       </a>
       <a routerLink="/account/withdraw" routerLinkActive="active">
         <i class="fas fa-money-bill nav-icon"></i>
-        Withdraw
+        出金
       </a>
       <a routerLink="/account/fund-transfer" routerLinkActive="active">
         <i class="fas fa-exchange-alt nav-icon"></i>
-        Fund Transfer
+        振込
       </a>
       <a routerLink="/account/pin" routerLinkActive="active">
         <i class="fas fa-key nav-icon"></i>
-        Account PIN
+        暗証番号
       </a>
       <a routerLink="/account" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
         <i class="fas fa-address-card nav-icon"></i>
-        Accounts & Cards
+        口座・カード
       </a>
       <a routerLink="/account/transactions" routerLinkActive="active">
         <i class="fas fa-history nav-icon"></i>
-        Transaction History
+        入出金明細
       </a>
     </nav>
 
-    <button type="button" (click)="logout()">Logout</button>
+    <button type="button" (click)="logout()">ログアウト</button>
   </aside>
 
   <main class="content">

@@ -29,7 +29,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    // doc jwt dua vao cac thong tin da co
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -38,7 +37,6 @@ public class JwtUtil {
                 .getBody();
     }
 
-    // extractallclaims de lay jwt su dung cho cac method sau
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }

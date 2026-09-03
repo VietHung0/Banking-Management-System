@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    // Lombok tự sinh constructor cho 2 field final này (constructor injection)
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountService accountService;
@@ -28,11 +27,11 @@ public class UserServiceImpl implements UserService {
 
     public ResponseEntity<String> registerUser(RegisterRequest request) {
         if (userRepository.findByEmail(request.email()).isPresent()) {
-            throw new UserInvalidException("Email đã tồn tại");
+            throw new UserInvalidException("このメールアドレスはすでに登録されています");
         }
 
         if (userRepository.findByPhoneNumber(request.phoneNumber()).isPresent()) {
-            throw new UserInvalidException("Số điện thoại đã tồn tại");
+            throw new UserInvalidException("この電話番号はすでに登録されています");
         }
 
         User user = new User();
@@ -47,19 +46,19 @@ public class UserServiceImpl implements UserService {
         Account account = accountService.createAccount(saveUser);
         saveUser.setAccount(account);
         userRepository.save(saveUser);
-        return ResponseEntity.ok("Đăng kí thành công");
+        return ResponseEntity.ok("口座開設が完了しました");
     }
 
     @Transactional
     @Override
     public UserResponse updateUser(String accountNumber, UpdateUserRequest request) {
         User user = userRepository.findByAccountAccountNumber(accountNumber)
-                .orElseThrow(() -> new UserInvalidException("Không tìm thấy user"));
+                .orElseThrow(() -> new UserInvalidException("お客さま情報が見つかりません"));
 
         userRepository.findByPhoneNumber(request.phoneNumber())
                 .filter(existingUser -> !existingUser.getId().equals(user.getId()))
                 .ifPresent(existingUser -> {
-                    throw new UserInvalidException("Số điện thoại đã tồn tại");
+                    throw new UserInvalidException("この電話番号はすでに登録されています");
                 });
 
         user.setName(request.name());

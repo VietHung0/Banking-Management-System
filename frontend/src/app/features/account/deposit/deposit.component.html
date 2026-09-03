@@ -1,31 +1,31 @@
 <section class="page-header">
   <div>
-    <h1>Deposit</h1>
-    <p>Nạp tiền vào tài khoản đang đăng nhập.</p>
+    <h1>入金</h1>
+    <p>ログイン中の口座へ入金します。</p>
   </div>
 </section>
 
 <section class="work-panel">
   <article class="form-card">
-    <span class="card-label">Cash Deposit</span>
-    <h2>Thông tin nạp tiền</h2>
+    <span class="card-label">入金手続き</span>
+    <h2>入金内容</h2>
 
     <form (ngSubmit)="onSubmit()">
       <label>
-        Số tiền
+        金額
         <input
           type="number"
           name="amount"
-          min="100"
-          max="10000000"
-          step="100"
+          min="1000"
+          max="1000000"
+          step="1000"
           [(ngModel)]="depositRequest.amount"
           required
         >
       </label>
 
       <label>
-        PIN
+        暗証番号
         <input
           type="password"
           name="pin"
@@ -38,15 +38,15 @@
       <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
       <button type="submit" [disabled]="isLoading">
-        {{ isLoading ? 'Đang xử lý...' : 'Nạp tiền' }}
+        {{ isLoading ? '処理中...' : '入金する' }}
       </button>
     </form>
   </article>
 
   <aside class="guide-card">
-    <h2>Lưu ý giao dịch</h2>
-    <p>Số tiền phải là bội số của ¥100.</p>
-    <p>Số tiền mỗi lần giao dịch không vượt quá ¥10,000,000.</p>
-    <p>PIN dùng để xác nhận thao tác trên tài khoản hiện tại.</p>
+    <h2>お取引時のご注意</h2>
+    <p>入金は1,000円以上、1,000円単位で入力してください。</p>
+    <p>1回あたりの入金上限は1,000,000円です。</p>
+    <p>お取引の確認には暗証番号が必要です。</p>
   </aside>
 </section>

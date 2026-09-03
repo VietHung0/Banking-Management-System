@@ -1,18 +1,18 @@
-<p class="status" *ngIf="isLoading">Đang tải dữ liệu...</p>
+<p class="status" *ngIf="isLoading">読み込み中...</p>
 <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
 <section class="dashboard-page" *ngIf="!isLoading && !errorMessage">
   <section class="summary-panel">
     <div class="summary-heading">
       <div>
-        <p class="welcome">Xin chào, {{ user?.name }}</p>
-        <span class="eyebrow">Main Account</span>
+        <p class="welcome">{{ user?.name }} さま</p>
+        <span class="eyebrow">代表口座</span>
         <h1>{{ account?.balance | currency:'JPY':'symbol':'1.0-0' }}</h1>
-        <p>Available balance</p>
+        <p>ご利用可能残高</p>
       </div>
 
       <div class="account-number">
-        <span>Account Number</span>
+        <span>口座番号</span>
         <strong>{{ account?.accountNumber }}</strong>
       </div>
     </div>
@@ -21,27 +21,27 @@
   <section class="quick-actions">
     <a routerLink="/account">
       <span>A</span>
-      Account
+      口座
     </a>
     <a routerLink="/account/deposit">
       <span>D</span>
-      Deposit
+      入金
     </a>
     <a routerLink="/account/withdraw">
       <span>W</span>
-      Withdraw
+      出金
     </a>
     <a routerLink="/account/fund-transfer">
       <span>T</span>
-      Transfer
+      振込
     </a>
     <a routerLink="/account/pin">
       <span>P</span>
-      PIN
+      暗証番号
     </a>
     <a routerLink="/account/transactions">
       <span>H</span>
-      History
+      明細
     </a>
   </section>
 
@@ -49,46 +49,46 @@
     <article class="chart-card">
       <div class="recent-header">
         <div>
-          <span>Transaction Overview</span>
-          <h2>Cash Flow</h2>
+          <span>お取引状況</span>
+          <h2>入出金サマリー</h2>
         </div>
         <div class="range-tabs">
-          <button type="button" [class.active]="selectedRange === 'THIS_MONTH'" (click)="changeRange('THIS_MONTH')">Month</button>
-          <button type="button" [class.active]="selectedRange === 'LAST_7_DAYS'" (click)="changeRange('LAST_7_DAYS')">7 Days</button>
-          <button type="button" [class.active]="selectedRange === 'ALL'" (click)="changeRange('ALL')">All</button>
+          <button type="button" [class.active]="selectedRange === 'THIS_MONTH'" (click)="changeRange('THIS_MONTH')">今月</button>
+          <button type="button" [class.active]="selectedRange === 'LAST_7_DAYS'" (click)="changeRange('LAST_7_DAYS')">7日間</button>
+          <button type="button" [class.active]="selectedRange === 'ALL'" (click)="changeRange('ALL')">全期間</button>
         </div>
       </div>
 
       <div class="cashflow-summary">
         <div>
-          <span>Money In</span>
+          <span>入金</span>
           <strong>{{ moneyIn | currency:'JPY':'symbol':'1.0-0' }}</strong>
         </div>
         <div>
-          <span>Money Out</span>
+          <span>出金</span>
           <strong>{{ moneyOut | currency:'JPY':'symbol':'1.0-0' }}</strong>
         </div>
         <div>
-          <span>Net Change</span>
+          <span>差引</span>
           <strong [class.negative]="netChange < 0">{{ netChange | currency:'JPY':'symbol':'1.0-0' }}</strong>
         </div>
       </div>
 
-      <p class="empty-state" *ngIf="cashFlowRows.length === 0">Chưa có dữ liệu dòng tiền cho khoảng thời gian này.</p>
+      <p class="empty-state" *ngIf="cashFlowRows.length === 0">対象期間のお取引はありません。</p>
 
       <div class="cashflow-chart" *ngIf="cashFlowRows.length > 0">
         <div class="cashflow-row" *ngFor="let row of cashFlowRows">
           <span class="cashflow-date">{{ row.date | date: 'MM/dd' }}</span>
           <div class="cashflow-bars">
             <div class="flow-line">
-              <span class="flow-label">In</span>
+              <span class="flow-label">入金</span>
               <div class="flow-track">
                 <span class="flow-fill in" [style.width.%]="row.inPercent"></span>
               </div>
               <strong>{{ row.moneyIn | currency:'JPY':'symbol':'1.0-0' }}</strong>
             </div>
             <div class="flow-line">
-              <span class="flow-label">Out</span>
+              <span class="flow-label">出金</span>
               <div class="flow-track">
                 <span class="flow-fill out" [style.width.%]="row.outPercent"></span>
               </div>
@@ -102,18 +102,18 @@
     <article class="recent-card">
       <div class="recent-header">
         <div>
-          <span>Recent Activity</span>
-          <h2>Latest Transactions</h2>
+          <span>最近のお取引</span>
+          <h2>直近の入出金明細</h2>
         </div>
-        <a routerLink="/account/transactions">View all</a>
+        <a routerLink="/account/transactions">すべて表示</a>
       </div>
 
-      <p class="empty-state" *ngIf="recentTransactions.length === 0">Chưa có giao dịch nào.</p>
+      <p class="empty-state" *ngIf="recentTransactions.length === 0">お取引はありません。</p>
 
       <div class="recent-list" *ngIf="recentTransactions.length > 0">
         <div class="recent-item" *ngFor="let transaction of recentTransactions">
           <div>
-            <strong>{{ transaction.transactionType }}</strong>
+            <strong>{{ getTransactionTypeLabel(transaction.transactionType) }}</strong>
             <span>{{ transaction.transactionDate | date: 'yyyy/MM/dd HH:mm' }}</span>
           </div>
           <strong class="amount">{{ transaction.amount | currency:'JPY':'symbol':'1.0-0' }}</strong>

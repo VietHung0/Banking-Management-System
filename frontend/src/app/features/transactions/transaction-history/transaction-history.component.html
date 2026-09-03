@@ -1,58 +1,58 @@
 <section class="page-header">
   <div>
-    <h1>Transactions</h1>
-    <p>Lịch sử giao dịch của tài khoản đang đăng nhập.</p>
+    <h1>入出金明細</h1>
+    <p>ログイン中の口座のお取引履歴を確認できます。</p>
   </div>
 
-  <button type="button" (click)="loadTransactions()">Refresh</button>
+  <button type="button" (click)="loadTransactions()">更新</button>
 </section>
 
-<p class="status" *ngIf="isLoading">Đang tải giao dịch...</p>
+<p class="status" *ngIf="isLoading">お取引明細を読み込み中...</p>
 <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
 <section class="filter-card">
   <label>
-    Type
+    取引種別
     <select name="type" [(ngModel)]="filter.type">
-      <option value="">All</option>
-      <option *ngFor="let type of transactionTypes" [value]="type">{{ type }}</option>
+      <option value="">すべて</option>
+      <option *ngFor="let type of transactionTypes" [value]="type">{{ getTransactionTypeLabel(type) }}</option>
     </select>
   </label>
 
   <label>
-    From date
+    開始日
     <input type="date" name="fromDate" [(ngModel)]="filter.fromDate">
   </label>
 
   <label>
-    To date
+    終了日
     <input type="date" name="toDate" [(ngModel)]="filter.toDate">
   </label>
 
   <div class="filter-actions">
-    <button type="button" (click)="loadTransactions()">Search</button>
-    <button type="button" class="secondary-button" (click)="clearFilter()">Clear</button>
+    <button type="button" (click)="loadTransactions()">検索</button>
+    <button type="button" class="secondary-button" (click)="clearFilter()">クリア</button>
   </div>
 </section>
 
 <section class="table-card" *ngIf="!isLoading && !errorMessage">
-  <p class="empty-state" *ngIf="transactions.length === 0">Chưa có giao dịch nào.</p>
+  <p class="empty-state" *ngIf="transactions.length === 0">お取引はありません。</p>
 
   <table *ngIf="transactions.length > 0">
     <thead>
       <tr>
-        <th>Loại</th>
-        <th>Số tiền</th>
-        <th>Nguồn</th>
-        <th>Đích</th>
-        <th>Lời nhắn</th>
-        <th>Thời gian</th>
+        <th>取引種別</th>
+        <th>金額</th>
+        <th>出金口座</th>
+        <th>入金口座</th>
+        <th>メッセージ</th>
+        <th>取引日時</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let transaction of transactions">
         <td>
-          <span class="type-badge">{{ transaction.transactionType }}</span>
+          <span class="type-badge">{{ getTransactionTypeLabel(transaction.transactionType) }}</span>
         </td>
         <td class="amount">{{ transaction.amount | currency:'JPY':'symbol':'1.0-0' }}</td>
         <td>{{ transaction.sourceAccountNumber }}</td>

@@ -21,7 +21,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public UserResponse getUserDetails(String accountNumber) {
         User user = userRepository.findByAccountAccountNumber(accountNumber)
-                .orElseThrow(() -> new AccountNotFoundException("Không tìm thấy user theo tài khoản"));
+                .orElseThrow(() -> new AccountNotFoundException("お客さま情報が見つかりません"));
 
         return new UserResponse(user);
     }
@@ -31,7 +31,7 @@ public class DashboardServiceImpl implements DashboardService {
         Account account = accountRepository.findByAccountNumber(accountNumber);
 
         if (account == null) {
-            throw new AccountNotFoundException("Không tìm thấy tài khoản");
+            throw new AccountNotFoundException("口座が見つかりません");
         }
 
         return new AccountResponse(account);

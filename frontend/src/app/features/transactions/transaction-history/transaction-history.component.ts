@@ -40,7 +40,7 @@ export class TransactionHistoryComponent {
       },
       error: () => {
         this.isLoading = false;
-        this.errorMessage = 'Không thể tải lịch sử giao dịch.';
+        this.errorMessage = 'お取引明細を取得できませんでした。';
       }
     });
   }
@@ -52,5 +52,18 @@ export class TransactionHistoryComponent {
       toDate: ''
     };
     this.loadTransactions();
+  }
+
+  getTransactionTypeLabel(type: string): string {
+    switch (type) {
+      case 'CASH_DEPOSIT':
+        return '入金';
+      case 'CASH_WITHDRAWAL':
+        return '出金';
+      case 'CASH_TRANSFER':
+        return '振込';
+      default:
+        return type;
+    }
   }
 }

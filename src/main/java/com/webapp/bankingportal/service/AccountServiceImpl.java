@@ -9,6 +9,9 @@ import com.webapp.bankingportal.repository.TransactionRepository;
 import com.webapp.bankingportal.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.webapp.bankingportal.entity.Account;
@@ -53,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
     public boolean isPinCreated(String accountNumber) {
         Account account = accountRepository.findByAccountNumber(accountNumber);
         if (account == null) {
-            throw new AccountNotFoundException("Không tìm thấy tài khoản");
+            throw new AccountNotFoundException("口座が見つかりません");
         }
 
         return account.getPin() != null;
@@ -62,13 +65,13 @@ public class AccountServiceImpl implements AccountService {
     private void validatePassword(String accountNumber, String password) {
         Account account = accountRepository.findByAccountNumber(accountNumber);
         if (account == null) {
-            throw new AccountNotFoundException("Không tìm thấy tài khoản");
+            throw new AccountNotFoundException("口座が見つかりません");
         }
         if (password == null || password.isEmpty()) {
-            throw new UserInvalidException("Mật khẩu không được để trống");
+            throw new UserInvalidException("パスワードを入力してください");
         }
         if (!passwordEncoder.matches(password, account.getUser().getPassword())) {
-            throw new UserInvalidException("Mật khẩu không đúng");
+            throw new UserInvalidException("パスワードが正しくありません");
         }
 
     }
@@ -80,11 +83,11 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findByAccountNumber(accountNumber);
 
         if (account.getPin() != null)
-            throw new InvalidPinException("PIN đã tồn tại");
+            throw new InvalidPinException("暗証番号はすでに登録されています");
         if (pin == null || pin.isEmpty())
-            throw new InvalidPinException("PIN không được để trống");
+            throw new InvalidPinException("暗証番号を入力してください");
         if (!pin.matches("[0-9]{4}"))
-            throw new InvalidPinException("PIN phải gồm đúng 4 chữ số");
+            throw new InvalidPinException("暗証番号は4桁の数字で入力してください");
 
         account.setPin(passwordEncoder.encode(pin));
         accountRepository.save(account);
@@ -94,17 +97,17 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findByAccountNumber(accountNumber);
 
         if (account == null) {
-            throw new AccountNotFoundException("Không tìm thấy tài khoản");
+            throw new AccountNotFoundException("口座が見つかりません");
         }
 
         if (account.getPin() == null) {
-            throw new InvalidPinException("Tài khoản chưa tạo PIN");
+            throw new InvalidPinException("暗証番号が未登録です");
         }
         if (pin == null || pin.isEmpty()) {
-            throw new InvalidPinException("PIN không được để trống");
+            throw new InvalidPinException("暗証番号を入力してください");
         }
         if (!passwordEncoder.matches(pin, account.getPin())) {
-            throw new InvalidPinException("PIN không đúng");
+            throw new InvalidPinException("暗証番号が正しくありません");
         }
     }
 
@@ -116,34 +119,90 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findByAccountNumber(accountNumber);
 
         if (newPin == null || newPin.isEmpty()) {
-            throw new InvalidPinException("PIN mới không được để trống");
+            throw new InvalidPinException("新しい暗証番号を入力してください");
         }
 
         if (!newPin.matches("[0-9]{4}")) {
-            throw new InvalidPinException("PIN mới phải gồm đúng 4 chữ số");
+            throw new InvalidPinException("新しい暗証番号は4桁の数字で入力してください");
         }
 
         account.setPin(passwordEncoder.encode(newPin));
         accountRepository.save(account);
     }
 
-    private void validateAmount(double amount) {
-        if (amount <= 0) {
-            throw new UserInvalidException("Số tiền phải lớn hơn 0");
+    private static final double DEPOSIT_MIN_AMOUNT = 1_000;
+    private static final double DEPOSIT_MAX_AMOUNT = 1_000_000;
+    private static final double WITHDRAW_MIN_AMOUNT = 1_000;
+    private static final double WITHDRAW_DAILY_LIMIT = 500_000;
+    private static final double TRANSFER_MIN_AMOUNT = 1;
+    private static final double TRANSFER_DAILY_LIMIT = 1_000_000;
+    private static final double CASH_STEP_AMOUNT = 1_000;
+    private static final ZoneId BANKING_ZONE = ZoneId.of("Asia/Bangkok");
+
+    private void validateDepositAmount(double amount) {
+        validateMinAmount(amount, DEPOSIT_MIN_AMOUNT);
+        validateWholeYenAmount(amount);
+        validateStepAmount(amount);
+        if (amount > DEPOSIT_MAX_AMOUNT) {
+            throw new UserInvalidException("入金は1回あたり1,000,000円までです");
         }
-        if (amount % 100 != 0) {
-            throw new UserInvalidException("Số tiền phải là bội số của 100");
+    }
+
+    private void validateWithdrawalAmount(String accountNumber, double amount) {
+        validateMinAmount(amount, WITHDRAW_MIN_AMOUNT);
+        validateWholeYenAmount(amount);
+        validateStepAmount(amount);
+        validateDailyLimit(accountNumber, TransactionType.CASH_WITHDRAWAL, amount, WITHDRAW_DAILY_LIMIT, "出金");
+    }
+
+    private void validateTransferAmount(String accountNumber, double amount) {
+        validateMinAmount(amount, TRANSFER_MIN_AMOUNT);
+        validateWholeYenAmount(amount);
+        validateDailyLimit(accountNumber, TransactionType.CASH_TRANSFER, amount, TRANSFER_DAILY_LIMIT, "振込");
+    }
+
+    private void validateMinAmount(double amount, double minAmount) {
+        if (amount < minAmount) {
+            throw new UserInvalidException("金額は" + formatAmount(minAmount) + "円以上で入力してください");
         }
-        if (amount > 10000000) {
-            throw new UserInvalidException("Số tiền không được vượt quá 10000000");
+    }
+
+    private void validateStepAmount(double amount) {
+        if (amount % CASH_STEP_AMOUNT != 0) {
+            throw new UserInvalidException("金額は1,000円単位で入力してください");
         }
+    }
+
+    private void validateWholeYenAmount(double amount) {
+        if (amount % 1 != 0) {
+            throw new UserInvalidException("金額は1円単位で入力してください");
+        }
+    }
+
+    private void validateDailyLimit(String accountNumber, TransactionType transactionType, double amount, double dailyLimit, String operationName) {
+        LocalDate today = LocalDate.now(BANKING_ZONE);
+        Date startDate = Date.from(today.atStartOfDay(BANKING_ZONE).toInstant());
+        Date endDate = Date.from(today.plusDays(1).atStartOfDay(BANKING_ZONE).toInstant());
+        double usedAmount = transactionRepository.sumAmountBySourceAccountAndTypeBetween(
+                accountNumber,
+                transactionType,
+                startDate,
+                endDate);
+
+        if (usedAmount + amount > dailyLimit) {
+            throw new UserInvalidException(operationName + "は1日あたり" + formatAmount(dailyLimit) + "円までです");
+        }
+    }
+
+    private String formatAmount(double amount) {
+        return String.format("%,.0f", amount);
     }
 
     @Transactional
     @Override
     public void cashDeposit(String accountNumber, String pin, double amount) {
         validatePin(accountNumber, pin);
-        validateAmount(amount);
+        validateDepositAmount(amount);
         Account account = accountRepository.findByAccountNumber(accountNumber);
         double currentBalance = account.getBalance();
         double newBalance = currentBalance + amount;
@@ -163,12 +222,12 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void cashWithdrawal(String accountNumber, String pin, double amount) {
         validatePin(accountNumber, pin);
-        validateAmount(amount);
+        validateWithdrawalAmount(accountNumber, amount);
 
         Account account = accountRepository.findByAccountNumber(accountNumber);
         double currentBalance = account.getBalance();
         if (currentBalance < amount) {
-            throw new UserInvalidException("Số dư không đủ");
+            throw new UserInvalidException("残高が不足しています");
         }
         double newBalance = currentBalance - amount;
         account.setBalance(newBalance);
@@ -187,22 +246,23 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void fundTransfer(String sourceAccountNumber, String targetAccountNumber, String pin, double amount, String message) {
         validatePin(sourceAccountNumber, pin);
-        validateAmount(amount);
+        targetAccountNumber = targetAccountNumber.trim();
+        validateTransferAmount(sourceAccountNumber, amount);
 
         if (sourceAccountNumber.equals(targetAccountNumber)) {
-            throw new UserInvalidException("Không thể chuyển tiền cho chính tài khoản của mình");
+            throw new UserInvalidException("ご自身の口座には振込できません");
         }
 
         Account sourceAccount = accountRepository.findByAccountNumber(sourceAccountNumber);
         Account targetAccount = accountRepository.findByAccountNumber(targetAccountNumber);
 
         if (targetAccount == null) {
-            throw new AccountNotFoundException("Không tìm thấy tài khoản nhận");
+            throw new AccountNotFoundException("振込先口座が見つかりません");
         }
         double sourceBalance = sourceAccount.getBalance();
 
         if (sourceBalance < amount) {
-            throw new UserInvalidException("Số dư không đủ");
+            throw new UserInvalidException("残高が不足しています");
         }
         sourceAccount.setBalance(sourceBalance - amount);
         targetAccount.setBalance(targetAccount.getBalance() + amount);
@@ -223,7 +283,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public RecipientResponse getRecipient(String accountNumber) {
         User user = userRepository.findByAccountAccountNumber(accountNumber)
-                .orElseThrow(() -> new AccountNotFoundException("Không tìm thấy tài khoản nhận"));
+                .orElseThrow(() -> new AccountNotFoundException("振込先口座が見つかりません"));
 
         return new RecipientResponse(accountNumber, user.getName());
     }

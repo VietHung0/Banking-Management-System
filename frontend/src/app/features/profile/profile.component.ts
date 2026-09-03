@@ -43,7 +43,7 @@ export class ProfileComponent {
         this.isLoading = false;
       },
       error: () => {
-        this.errorMessage = 'Không thể tải thông tin profile.';
+        this.errorMessage = 'お客さま情報を取得できませんでした。';
         this.isLoading = false;
       }
     });
@@ -76,11 +76,11 @@ export class ProfileComponent {
         this.fillUpdateForm(user);
         this.isSaving = false;
         this.isEditing = false;
-        this.successMessage = 'Cập nhật profile thành công.';
+        this.successMessage = 'お客さま情報を更新しました。';
       },
       error: () => {
         this.isSaving = false;
-        this.errorMessage = 'Cập nhật profile thất bại. Vui lòng kiểm tra lại thông tin.';
+        this.errorMessage = 'お客さま情報を更新できませんでした。入力内容をご確認ください。';
       }
     });
   }
@@ -92,5 +92,15 @@ export class ProfileComponent {
       phoneNumber: user.phoneNumber,
       address: user.address
     };
+  }
+
+  getAccountTypeLabel(accountType?: string): string {
+    switch (accountType) {
+      case 'Ordinary Deposit':
+      case 'Savings':
+        return '普通預金';
+      default:
+        return accountType || '-';
+    }
   }
 }

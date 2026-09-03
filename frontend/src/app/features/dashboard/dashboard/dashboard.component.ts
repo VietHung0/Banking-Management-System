@@ -84,7 +84,7 @@ export class DashboardComponent {
 
   private handleError(): void {
     this.isLoading = false;
-    this.errorMessage = 'Không thể tải thông tin dashboard.';
+    this.errorMessage = 'ホーム画面の情報を取得できませんでした。';
   }
 
   private buildCashFlow(transactions: Transaction[]): void {
@@ -149,6 +149,19 @@ export class DashboardComponent {
 
   private toPercent(amount: number, maxAmount: number): number {
     return amount === 0 ? 0 : Math.max((amount / maxAmount) * 100, 8);
+  }
+
+  getTransactionTypeLabel(type: string): string {
+    switch (type) {
+      case 'CASH_DEPOSIT':
+        return '入金';
+      case 'CASH_WITHDRAWAL':
+        return '出金';
+      case 'CASH_TRANSFER':
+        return '振込';
+      default:
+        return type;
+    }
   }
 }
 

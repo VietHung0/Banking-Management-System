@@ -39,11 +39,13 @@ export class PinComponent {
     this.errorMessage = '';
     this.accountService.checkPin().subscribe({
       next: (response) => {
-        this.statusMessage = response.message;
+        this.statusMessage = response.hasPin
+          ? '暗証番号は登録済みです。'
+          : '暗証番号は未登録です。';
         this.hasPin = response.hasPin;
       },
       error: () => {
-        this.errorMessage = 'Không thể kiểm tra trạng thái PIN.';
+        this.errorMessage = '暗証番号の登録状況を確認できませんでした。';
       }
     });
   }
@@ -64,12 +66,12 @@ export class PinComponent {
     action().subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.statusMessage = response;
+        this.statusMessage = '暗証番号の手続きが完了しました。';
         this.checkPin();
       },
       error: () => {
         this.isLoading = false;
-        this.errorMessage = 'Thao tác PIN thất bại. Vui lòng kiểm tra lại thông tin.';
+        this.errorMessage = '暗証番号の手続きができませんでした。入力内容をご確認ください。';
       }
     });
   }

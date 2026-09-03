@@ -42,7 +42,7 @@ public class AccountController {
     @GetMapping("/pin/check")
     public ResponseEntity<PinStatusResponse> checkPin() {
         boolean hasPin = accountService.isPinCreated(LoggedinUser.getAccountNumber());
-        String message = hasPin ? "PIN đã được tạo" : "PIN chưa được tạo";
+        String message = hasPin ? "暗証番号は登録済みです" : "暗証番号は未登録です";
 
         return ResponseEntity.ok(new PinStatusResponse(hasPin, message));
     }
@@ -53,7 +53,7 @@ public class AccountController {
                 LoggedinUser.getAccountNumber(),
                 pinRequest.password(),
                 pinRequest.pin());
-        return ResponseEntity.ok("Tạo PIN thành công");
+        return ResponseEntity.ok("暗証番号を登録しました");
     }
 
     @PostMapping("/pin/update")
@@ -63,7 +63,7 @@ public class AccountController {
                 pinUpdateRequest.oldPin(),
                 pinUpdateRequest.password(),
                 pinUpdateRequest.newPin());
-        return ResponseEntity.ok("Đổi PIN thành công");
+        return ResponseEntity.ok("暗証番号を変更しました");
     }
 
     @PostMapping("/deposit")
@@ -76,7 +76,7 @@ public class AccountController {
                     accountNumber,
                     amountRequest.pin(),
                     amountRequest.amount());
-            return "Gửi tiền thành công";
+            return "入金が完了しました";
         });
         return ResponseEntity.ok(response);
     }
@@ -91,7 +91,7 @@ public class AccountController {
                     accountNumber,
                     amountRequest.pin(),
                     amountRequest.amount());
-            return "Rút tiền thành công";
+            return "出金が完了しました";
         });
         return ResponseEntity.ok(response);
     }
@@ -108,7 +108,7 @@ public class AccountController {
                     fundTransferRequest.pin(),
                     fundTransferRequest.amount(),
                     fundTransferRequest.message());
-            return "Chuyển tiền thành công";
+            return "振込が完了しました";
         });
         return ResponseEntity.ok(response);
     }

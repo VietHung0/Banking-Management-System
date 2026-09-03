@@ -38,7 +38,7 @@ export class LoginComponent {
       },
       error: () => {
         this.isLoading = false;
-        this.errorMessage = 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.';
+        this.errorMessage = 'ログインできませんでした。入力内容をご確認ください。';
       }
     });
   }

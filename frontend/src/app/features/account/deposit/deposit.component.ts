@@ -31,22 +31,33 @@ export class DepositComponent {
 
     this.successMessage = '';
     this.errorMessage = '';
+
+    if (!this.isValidDepositAmount()) {
+      this.errorMessage = '入金は1,000円以上、1,000,000円以下、1,000円単位で入力してください。';
+      return;
+    }
+
     this.isLoading = true;
     const idempotencyKey = this.accountService.createIdempotencyKey();
 
     this.accountService.deposit(this.depositRequest, idempotencyKey).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.successMessage = response;
+        this.successMessage = '入金が完了しました。';
         this.depositRequest = {
           pin: '',
           amount: 0
         };
       },
-      error: (error) => {
+      error: () => {
         this.isLoading = false;
-        this.errorMessage = error.error || 'Nạp tiền thất bại. Vui lòng kiểm tra lại PIN hoặc số tiền.';
+        this.errorMessage = '入金できませんでした。暗証番号、金額、または入金上限をご確認ください。';
       }
     });
+  }
+
+  private isValidDepositAmount(): boolean {
+    const amount = this.depositRequest.amount;
+    return amount >= 1000 && amount <= 1000000 && amount % 1000 === 0;
   }
 }

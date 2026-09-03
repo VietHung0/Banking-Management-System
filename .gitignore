@@ -1,5 +1,8 @@
 # Compiled output
 target/
+frontend/dist/
+frontend/.angular/
+frontend/node_modules/
 
 # IDE
 .idea/

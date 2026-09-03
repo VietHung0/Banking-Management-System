@@ -21,7 +21,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public UserDetails loadUserByUsername(String accountNumber) throws UsernameNotFoundException {
         User user = userRepository.findByAccountAccountNumber(accountNumber)
-                .orElseThrow(() -> new UsernameNotFoundException("Tài khoản không tồn tại"));
+                .orElseThrow(() -> new UsernameNotFoundException("口座が見つかりません"));
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getAccount().getAccountNumber())
                 .password(user.getPassword())

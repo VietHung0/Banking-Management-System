@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//la response tra lai cho client
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,7 +31,7 @@ public class TransactionDTO {
         if (transaction.getTargetAccount() != null) {
             this.targetAccountNumber = transaction.getTargetAccount().getAccountNumber();
         } else {
-            this.targetAccountNumber = "N/A";
+            this.targetAccountNumber = "-";
         }
     }
 

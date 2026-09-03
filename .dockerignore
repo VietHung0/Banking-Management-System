@@ -1,0 +1,9 @@
+target/
+frontend/
+.git/
+.vscode/
+.idea/
+*.iml
+*.log
+README.md
+ROADMAP.md

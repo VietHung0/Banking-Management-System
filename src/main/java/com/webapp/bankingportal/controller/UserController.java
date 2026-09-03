@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController {
 
-    // Lombok tự sinh constructor để Spring tiêm UserService vào
     private final UserService userService;
     private final AuthService authService;
 

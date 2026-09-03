@@ -38,14 +38,14 @@ export class RegisterComponent {
     this.isLoading = true;
 
     this.authService.register(this.registerRequest).subscribe({
-      next: (response) => {
+      next: () => {
         this.isLoading = false;
-        this.successMessage = response;
+        this.successMessage = '口座開設が完了しました。ログイン画面へ移動します。';
         this.router.navigate(['/login']);
       },
       error: () => {
         this.isLoading = false;
-        this.errorMessage = 'Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.';
+        this.errorMessage = '口座開設できませんでした。入力内容をご確認ください。';
       }
     });
   }

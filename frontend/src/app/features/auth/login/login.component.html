@@ -3,20 +3,20 @@
     <div class="brand">
       <span class="brand-mark">N</span>
       <div>
-        <strong>NetBank Demo</strong>
-        <span>Internet Banking</span>
+        <strong>ネット銀行デモ</strong>
+        <span>インターネットバンキング</span>
       </div>
     </div>
   </header>
 
   <section class="auth-content">
     <div class="login-box">
-      <h1>Đăng nhập</h1>
-      <p class="intro">Nhập email hoặc số tài khoản để truy cập dịch vụ ngân hàng trực tuyến.</p>
+      <h1>ログイン</h1>
+      <p class="intro">メールアドレスまたは口座番号を入力して、インターネットバンキングにログインしてください。</p>
 
       <form class="auth-form" (ngSubmit)="onSubmit()">
         <label>
-          Email / Số tài khoản
+          メールアドレス / 口座番号
           <input
             type="text"
             name="identifier"
@@ -27,7 +27,7 @@
         </label>
 
         <label>
-          Mật khẩu WEB
+          WEBログインパスワード
           <input
             type="password"
             name="password"
@@ -40,15 +40,15 @@
         <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
         <button type="submit" [disabled]="isLoading">
-          {{ isLoading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+          {{ isLoading ? 'ログイン中...' : 'ログイン' }}
         </button>
       </form>
     </div>
 
     <aside class="support-box">
-      <h2>Khách hàng mới</h2>
-      <p>Mở tài khoản demo để sử dụng dashboard, nạp tiền, rút tiền và chuyển khoản.</p>
-      <a routerLink="/register">Đăng ký tài khoản</a>
+      <h2>はじめてご利用の方</h2>
+      <p>デモ口座を開設すると、入金・出金・振込などの機能をご利用いただけます。</p>
+      <a routerLink="/register">口座開設</a>
     </aside>
   </section>
 </main>

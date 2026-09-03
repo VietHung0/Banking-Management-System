@@ -27,9 +27,33 @@ export class AccountInfoComponent {
         this.isLoading = false;
       },
       error: () => {
-        this.errorMessage = 'Không thể tải thông tin tài khoản.';
+        this.errorMessage = '口座情報を取得できませんでした。';
         this.isLoading = false;
       }
     });
+  }
+
+  getAccountTypeLabel(accountType?: string): string {
+    switch (accountType) {
+      case 'Ordinary Deposit':
+        return '普通預金';
+      case 'Savings':
+        return '普通預金';
+      default:
+        return accountType || '-';
+    }
+  }
+
+  getAccountStatusLabel(accountStatus?: string): string {
+    switch (accountStatus) {
+      case 'ACTIVE':
+      case 'Active':
+        return '利用中';
+      case 'INACTIVE':
+      case 'Inactive':
+        return '停止中';
+      default:
+        return accountStatus || '-';
+    }
   }
 }

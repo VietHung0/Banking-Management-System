@@ -3,8 +3,8 @@
     <div class="brand">
       <span class="brand-mark">N</span>
       <div>
-        <strong>NetBank Demo</strong>
-        <span>Internet Banking</span>
+        <strong>ネット銀行デモ</strong>
+        <span>インターネットバンキング</span>
       </div>
     </div>
   </header>
@@ -12,28 +12,28 @@
   <section class="auth-shell">
     <div class="auth-panel">
       <div class="panel-title">
-        <span>New Account</span>
-        <h1>Đăng ký tài khoản</h1>
-        <p>Tạo tài khoản demo để sử dụng dịch vụ ngân hàng trực tuyến.</p>
+        <span>口座開設</span>
+        <h1>新規口座開設</h1>
+        <p>インターネットバンキングをご利用いただくため、お客さま情報を入力してください。</p>
       </div>
 
       <form class="auth-form" (ngSubmit)="onSubmit()">
         <div class="form-section">
-          <h2>Thông tin cá nhân</h2>
+          <h2>お客さま情報</h2>
 
           <label>
-            Họ tên
+            お名前
             <input type="text" name="name" [(ngModel)]="registerRequest.name" required autocomplete="name">
           </label>
 
           <label>
-            Địa chỉ
+            ご住所
             <input type="text" name="address" [(ngModel)]="registerRequest.address" required autocomplete="street-address">
           </label>
         </div>
 
         <div class="form-section">
-          <h2>Thông tin liên hệ</h2>
+          <h2>ご連絡先</h2>
 
           <label>
             Email
@@ -42,22 +42,22 @@
 
           <div class="phone-row">
             <label>
-              Mã quốc gia
+              国番号
               <input type="text" name="countryCode" [(ngModel)]="registerRequest.countryCode" required>
             </label>
 
             <label>
-              Số điện thoại
+              電話番号
               <input type="tel" name="phoneNumber" [(ngModel)]="registerRequest.phoneNumber" required autocomplete="tel">
             </label>
           </div>
         </div>
 
         <div class="form-section">
-          <h2>Bảo mật đăng nhập</h2>
+          <h2>ログイン設定</h2>
 
           <label>
-            Mật khẩu WEB
+            WEBログインパスワード
             <input type="password" name="password" [(ngModel)]="registerRequest.password" required autocomplete="new-password">
           </label>
         </div>
@@ -66,24 +66,24 @@
         <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
         <button type="submit" [disabled]="isLoading">
-          {{ isLoading ? 'Đang đăng ký...' : 'Đăng ký' }}
+          {{ isLoading ? '登録中...' : '口座を開設する' }}
         </button>
       </form>
     </div>
 
     <aside class="guide-panel">
       <section>
-        <h2>Đã có tài khoản?</h2>
-        <p>Đăng nhập bằng email hoặc số tài khoản đã được cấp.</p>
-        <a routerLink="/login">Đăng nhập</a>
+        <h2>すでに口座をお持ちの方</h2>
+        <p>メールアドレスまたは口座番号でログインできます。</p>
+        <a routerLink="/login">ログイン</a>
       </section>
 
       <section>
-        <h2>Lưu ý bảo mật</h2>
+        <h2>セキュリティのお願い</h2>
         <ul>
-          <li>Không dùng mật khẩu trùng với mã PIN.</li>
-          <li>Không chia sẻ mật khẩu WEB cho người khác.</li>
-          <li>Thông tin đăng ký cần khớp với hồ sơ tài khoản.</li>
+          <li>暗証番号と同じパスワードは設定しないでください。</li>
+          <li>WEBログインパスワードを第三者に共有しないでください。</li>
+          <li>正しいお客さま情報を入力してください。</li>
         </ul>
       </section>
     </aside>

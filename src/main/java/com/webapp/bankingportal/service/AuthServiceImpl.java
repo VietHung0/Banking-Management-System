@@ -24,20 +24,18 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final TokenRepository tokenRepository;
 
-    // tu tao constructor cho cac bien final
     @Override
     public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
         User user;
-        // identifier la mail hoac accountNumber
         if (loginRequest.identifier().contains("@")) {
             user = userRepository.findByEmail(loginRequest.identifier())
-                    .orElseThrow(() -> new UserInvalidException("Email không tồn tại"));
+                    .orElseThrow(() -> new UserInvalidException("メールアドレスが登録されていません"));
         } else {
             user = userRepository.findByAccountAccountNumber(loginRequest.identifier())
-                    .orElseThrow(() -> new UserInvalidException("Số tài khoản không tồn tại"));
+                    .orElseThrow(() -> new UserInvalidException("口座番号が登録されていません"));
         }
         if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
-            throw new UserInvalidException("Sai mật khẩu");
+            throw new UserInvalidException("パスワードが正しくありません");
         }
 
         String accountNumber = user.getAccount().getAccountNumber();
@@ -49,16 +47,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<String> logout(String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new UserInvalidException("Token không hợp lệ");
+            throw new UserInvalidException("トークンが正しくありません");
         }
 
         String token = authorizationHeader.substring(7);
         Token savedToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new UserInvalidException("Token không tồn tại"));
+                .orElseThrow(() -> new UserInvalidException("トークンが見つかりません"));
 
         savedToken.setRevoked(true);
         tokenRepository.save(savedToken);
 
-        return ResponseEntity.ok("Đăng xuất thành công");
+        return ResponseEntity.ok("ログアウトしました");
     }
 }
