@@ -31,7 +31,7 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      JWT_SECRET: ${JWT_SECRET:?Create .env from .env.example and set JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:-banking-management-demo-jwt-secret-2026}
       TZ: Asia/Bangkok
     ports:
       - "8180:8180"

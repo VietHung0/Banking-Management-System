@@ -122,9 +122,6 @@
 git clone https://github.com/VietHung0/Banking-Management-System.git
 cd Banking-Management-System
 
-# Create the local environment file, then replace JWT_SECRET with a random value of at least 32 characters
-Copy-Item .env.example .env
-
 # Start all services with Docker Compose
 docker compose up --build -d
 ```
