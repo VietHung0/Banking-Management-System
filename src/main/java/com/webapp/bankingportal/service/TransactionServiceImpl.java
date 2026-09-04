@@ -29,7 +29,7 @@ public class TransactionServiceImpl implements TransactionService {
                         accountNumber)
                 .stream()
                 .sorted(Comparator.comparing(transaction -> transaction.getTransactionDate(), Comparator.reverseOrder()))
-                .map(TransactionDTO::new)
+                .map(transaction -> new TransactionDTO(transaction, accountNumber))
                 .toList();
     }
 
@@ -48,7 +48,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .filter(transaction -> fromDate == null || !toLocalDate(transaction.getTransactionDate()).isBefore(fromDate))
                 .filter(transaction -> toDate == null || !toLocalDate(transaction.getTransactionDate()).isAfter(toDate))
                 .sorted(Comparator.comparing(transaction -> transaction.getTransactionDate(), Comparator.reverseOrder()))
-                .map(TransactionDTO::new)
+                .map(transaction -> new TransactionDTO(transaction, accountNumber))
                 .toList();
     }
 

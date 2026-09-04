@@ -54,16 +54,12 @@
         <strong>{{ user?.address }}</strong>
       </div>
       <div>
-        <span>口座番号</span>
-        <strong>{{ user?.accountNumber }}</strong>
+        <span>金融機関名</span>
+        <strong>{{ user?.bankName }}</strong>
       </div>
       <div>
         <span>金融機関コード</span>
         <strong>{{ user?.bankCode }}</strong>
-      </div>
-      <div>
-        <span>金融機関住所</span>
-        <strong>{{ user?.bankAddress }}</strong>
       </div>
       <div>
         <span>支店名</span>
@@ -74,8 +70,12 @@
         <strong>{{ user?.branchCode }}</strong>
       </div>
       <div>
-        <span>口座種別</span>
+        <span>預金種目</span>
         <strong>{{ getAccountTypeLabel(user?.accountType) }}</strong>
+      </div>
+      <div>
+        <span>口座番号</span>
+        <strong>{{ user?.accountNumber }}</strong>
       </div>
     </div>
   </article>

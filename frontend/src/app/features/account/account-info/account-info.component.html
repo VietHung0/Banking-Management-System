@@ -4,7 +4,7 @@
 <section class="account-page" *ngIf="!isLoading && !errorMessage">
   <article class="balance-card">
     <span>代表口座</span>
-    <h1>{{ account?.balance | currency:'JPY':'symbol':'1.0-0' }}</h1>
+    <h1>{{ account?.balance | number:'1.0-0' }}円</h1>
     <p>ご利用可能残高</p>
   </article>
 
@@ -13,20 +13,12 @@
 
     <div class="detail-list">
       <div>
-        <span>口座番号</span>
-        <strong>{{ account?.accountNumber }}</strong>
-      </div>
-      <div>
-        <span>口座種別</span>
-        <strong>{{ getAccountTypeLabel(account?.accountType) }}</strong>
+        <span>金融機関名</span>
+        <strong>{{ account?.bankName }}</strong>
       </div>
       <div>
         <span>金融機関コード</span>
         <strong>{{ account?.bankCode }}</strong>
-      </div>
-      <div>
-        <span>金融機関住所</span>
-        <strong>{{ account?.bankAddress }}</strong>
       </div>
       <div>
         <span>支店名</span>
@@ -37,8 +29,12 @@
         <strong>{{ account?.branchCode }}</strong>
       </div>
       <div>
-        <span>口座ステータス</span>
-        <strong>{{ getAccountStatusLabel(account?.accountStatus) }}</strong>
+        <span>預金種目</span>
+        <strong>{{ getAccountTypeLabel(account?.accountType) }}</strong>
+      </div>
+      <div>
+        <span>口座番号</span>
+        <strong>{{ account?.accountNumber }}</strong>
       </div>
     </div>
   </article>

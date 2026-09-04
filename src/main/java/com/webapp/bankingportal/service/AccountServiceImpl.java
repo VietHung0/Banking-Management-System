@@ -38,7 +38,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = new Account();
         account.setAccountNumber(generateUniqueAccountNumber());
         account.setAccountStatus("Active");
-        account.setBalance(0.0);
+        account.setBalance(0L);
         account.setUser(user);
         return accountRepository.save(account);
     }
@@ -130,60 +130,51 @@ public class AccountServiceImpl implements AccountService {
         accountRepository.save(account);
     }
 
-    private static final double DEPOSIT_MIN_AMOUNT = 1_000;
-    private static final double DEPOSIT_MAX_AMOUNT = 1_000_000;
-    private static final double WITHDRAW_MIN_AMOUNT = 1_000;
-    private static final double WITHDRAW_DAILY_LIMIT = 500_000;
-    private static final double TRANSFER_MIN_AMOUNT = 1;
-    private static final double TRANSFER_DAILY_LIMIT = 1_000_000;
-    private static final double CASH_STEP_AMOUNT = 1_000;
+    private static final long DEPOSIT_MIN_AMOUNT = 1_000;
+    private static final long DEPOSIT_MAX_AMOUNT = 1_000_000;
+    private static final long WITHDRAW_MIN_AMOUNT = 1_000;
+    private static final long WITHDRAW_DAILY_LIMIT = 500_000;
+    private static final long TRANSFER_MIN_AMOUNT = 1;
+    private static final long TRANSFER_DAILY_LIMIT = 1_000_000;
+    private static final long CASH_STEP_AMOUNT = 1_000;
     private static final ZoneId BANKING_ZONE = ZoneId.of("Asia/Bangkok");
 
-    private void validateDepositAmount(double amount) {
+    private void validateDepositAmount(long amount) {
         validateMinAmount(amount, DEPOSIT_MIN_AMOUNT);
-        validateWholeYenAmount(amount);
         validateStepAmount(amount);
         if (amount > DEPOSIT_MAX_AMOUNT) {
             throw new UserInvalidException("入金は1回あたり1,000,000円までです");
         }
     }
 
-    private void validateWithdrawalAmount(String accountNumber, double amount) {
+    private void validateWithdrawalAmount(String accountNumber, long amount) {
         validateMinAmount(amount, WITHDRAW_MIN_AMOUNT);
-        validateWholeYenAmount(amount);
         validateStepAmount(amount);
         validateDailyLimit(accountNumber, TransactionType.CASH_WITHDRAWAL, amount, WITHDRAW_DAILY_LIMIT, "出金");
     }
 
-    private void validateTransferAmount(String accountNumber, double amount) {
+    private void validateTransferAmount(String accountNumber, long amount) {
         validateMinAmount(amount, TRANSFER_MIN_AMOUNT);
-        validateWholeYenAmount(amount);
         validateDailyLimit(accountNumber, TransactionType.CASH_TRANSFER, amount, TRANSFER_DAILY_LIMIT, "振込");
     }
 
-    private void validateMinAmount(double amount, double minAmount) {
+    private void validateMinAmount(long amount, long minAmount) {
         if (amount < minAmount) {
             throw new UserInvalidException("金額は" + formatAmount(minAmount) + "円以上で入力してください");
         }
     }
 
-    private void validateStepAmount(double amount) {
+    private void validateStepAmount(long amount) {
         if (amount % CASH_STEP_AMOUNT != 0) {
             throw new UserInvalidException("金額は1,000円単位で入力してください");
         }
     }
 
-    private void validateWholeYenAmount(double amount) {
-        if (amount % 1 != 0) {
-            throw new UserInvalidException("金額は1円単位で入力してください");
-        }
-    }
-
-    private void validateDailyLimit(String accountNumber, TransactionType transactionType, double amount, double dailyLimit, String operationName) {
+    private void validateDailyLimit(String accountNumber, TransactionType transactionType, long amount, long dailyLimit, String operationName) {
         LocalDate today = LocalDate.now(BANKING_ZONE);
         Date startDate = Date.from(today.atStartOfDay(BANKING_ZONE).toInstant());
         Date endDate = Date.from(today.plusDays(1).atStartOfDay(BANKING_ZONE).toInstant());
-        double usedAmount = transactionRepository.sumAmountBySourceAccountAndTypeBetween(
+        long usedAmount = transactionRepository.sumAmountBySourceAccountAndTypeBetween(
                 accountNumber,
                 transactionType,
                 startDate,
@@ -194,18 +185,18 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    private String formatAmount(double amount) {
-        return String.format("%,.0f", amount);
+    private String formatAmount(long amount) {
+        return String.format("%,d", amount);
     }
 
     @Transactional
     @Override
-    public void cashDeposit(String accountNumber, String pin, double amount) {
+    public void cashDeposit(String accountNumber, String pin, long amount) {
         validatePin(accountNumber, pin);
         validateDepositAmount(amount);
         Account account = accountRepository.findByAccountNumber(accountNumber);
-        double currentBalance = account.getBalance();
-        double newBalance = currentBalance + amount;
+        long currentBalance = account.getBalance();
+        long newBalance = currentBalance + amount;
         account.setBalance(newBalance);
         accountRepository.save(account);
 
@@ -220,16 +211,16 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     @Override
-    public void cashWithdrawal(String accountNumber, String pin, double amount) {
+    public void cashWithdrawal(String accountNumber, String pin, long amount) {
         validatePin(accountNumber, pin);
         validateWithdrawalAmount(accountNumber, amount);
 
         Account account = accountRepository.findByAccountNumber(accountNumber);
-        double currentBalance = account.getBalance();
+        long currentBalance = account.getBalance();
         if (currentBalance < amount) {
             throw new UserInvalidException("残高が不足しています");
         }
-        double newBalance = currentBalance - amount;
+        long newBalance = currentBalance - amount;
         account.setBalance(newBalance);
         accountRepository.save(account);
 
@@ -244,7 +235,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     @Override
-    public void fundTransfer(String sourceAccountNumber, String targetAccountNumber, String pin, double amount, String message) {
+    public void fundTransfer(String sourceAccountNumber, String targetAccountNumber, String pin, long amount, String message) {
         validatePin(sourceAccountNumber, pin);
         targetAccountNumber = targetAccountNumber.trim();
         validateTransferAmount(sourceAccountNumber, amount);
@@ -259,7 +250,7 @@ public class AccountServiceImpl implements AccountService {
         if (targetAccount == null) {
             throw new AccountNotFoundException("振込先口座が見つかりません");
         }
-        double sourceBalance = sourceAccount.getBalance();
+        long sourceBalance = sourceAccount.getBalance();
 
         if (sourceBalance < amount) {
             throw new UserInvalidException("残高が不足しています");
@@ -285,7 +276,17 @@ public class AccountServiceImpl implements AccountService {
         User user = userRepository.findByAccountAccountNumber(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("振込先口座が見つかりません"));
 
-        return new RecipientResponse(accountNumber, user.getName());
+        Account account = user.getAccount();
+        return new RecipientResponse(
+                account.getAccountNumber(),
+                user.getName(),
+                account.getBankName() == null ? "ドコモSMTBネット銀行" : account.getBankName(),
+                account.getBankCode(),
+                account.getBranch() == null || "Ichigo Branch".equals(account.getBranch())
+                        ? "イチゴ支店"
+                        : account.getBranch(),
+                account.getBranchCode(),
+                account.getAccountType());
     }
 
 }

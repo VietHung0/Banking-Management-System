@@ -9,6 +9,7 @@ import { PinComponent } from './features/account/pin/pin.component';
 import { TransferComponent } from './features/account/transfer/transfer.component';
 import { WithdrawComponent } from './features/account/withdraw/withdraw.component';
 import { DashboardComponent } from './features/dashboard/dashboard/dashboard.component';
+import { PublicHomeComponent } from './features/public-home/public-home.component';
 import { ProfileComponent } from './features/profile/profile.component';
 import { TransactionHistoryComponent } from './features/transactions/transaction-history/transaction-history.component';
 import { MainLayoutComponent } from './shared/main-layout/main-layout.component';
@@ -16,7 +17,7 @@ import { MainLayoutComponent } from './shared/main-layout/main-layout.component'
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
+    component: PublicHomeComponent,
     pathMatch: 'full'
   },
   {

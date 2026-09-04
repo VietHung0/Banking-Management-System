@@ -44,6 +44,26 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    if (!token) {
+      return false;
+    }
+
+    try {
+      const payloadPart = token.split('.')[1];
+      const normalizedPayload = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
+      const paddedPayload = normalizedPayload.padEnd(Math.ceil(normalizedPayload.length / 4) * 4, '=');
+      const payload = JSON.parse(atob(paddedPayload));
+      const isActive = typeof payload.exp === 'number' && Date.now() < payload.exp * 1000;
+
+      if (!isActive) {
+        this.clearToken();
+      }
+
+      return isActive;
+    } catch {
+      this.clearToken();
+      return false;
+    }
   }
 }

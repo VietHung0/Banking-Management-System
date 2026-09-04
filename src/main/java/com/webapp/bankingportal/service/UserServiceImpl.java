@@ -23,8 +23,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final AccountService accountService;
 
+    @Transactional
     @Override
-
     public ResponseEntity<String> registerUser(RegisterRequest request) {
         if (userRepository.findByEmail(request.email()).isPresent()) {
             throw new UserInvalidException("このメールアドレスはすでに登録されています");

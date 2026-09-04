@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CurrencyPipe, DatePipe, NgFor, NgIf } from '@angular/common';
+import { DatePipe, DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 import { AccountResponse } from '../../../core/models/account.model';
@@ -11,7 +11,7 @@ import { TransactionService } from '../../../core/services/transaction.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgIf, NgFor, CurrencyPipe, DatePipe, RouterLink],
+  imports: [NgIf, NgFor, DecimalPipe, DatePipe, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -19,6 +19,7 @@ export class DashboardComponent {
   user?: UserResponse;
   account?: AccountResponse;
   recentTransactions: Transaction[] = [];
+  allTransactions: Transaction[] = [];
   cashFlowRows: CashFlowRow[] = [];
   moneyIn = 0;
   moneyOut = 0;
@@ -51,6 +52,7 @@ export class DashboardComponent {
     this.dashboardService.getAccount().subscribe({
       next: (account) => {
         this.account = account;
+        this.buildCashFlow(this.allTransactions);
         this.finishLoadingIfReady();
       },
       error: () => this.handleError()
@@ -58,6 +60,7 @@ export class DashboardComponent {
 
     this.transactionService.getTransactions().subscribe({
       next: (transactions) => {
+        this.allTransactions = transactions;
         this.recentTransactions = transactions.slice(0, 5);
         this.buildCashFlow(transactions);
       },
@@ -101,7 +104,7 @@ export class DashboardComponent {
         outPercent: 0
       };
 
-      if (transaction.transactionType === 'CASH_DEPOSIT') {
+      if (this.isMoneyIn(transaction)) {
         row.moneyIn += transaction.amount;
       } else {
         row.moneyOut += transaction.amount;
@@ -111,10 +114,10 @@ export class DashboardComponent {
     });
 
     this.moneyIn = filteredTransactions
-      .filter((transaction) => transaction.transactionType === 'CASH_DEPOSIT')
+      .filter((transaction) => this.isMoneyIn(transaction))
       .reduce((total, transaction) => total + transaction.amount, 0);
     this.moneyOut = filteredTransactions
-      .filter((transaction) => transaction.transactionType !== 'CASH_DEPOSIT')
+      .filter((transaction) => !this.isMoneyIn(transaction))
       .reduce((total, transaction) => total + transaction.amount, 0);
     this.netChange = this.moneyIn - this.moneyOut;
 
@@ -149,6 +152,12 @@ export class DashboardComponent {
 
   private toPercent(amount: number, maxAmount: number): number {
     return amount === 0 ? 0 : Math.max((amount / maxAmount) * 100, 8);
+  }
+
+  private isMoneyIn(transaction: Transaction): boolean {
+    return transaction.transactionType === 'CASH_DEPOSIT' ||
+      (transaction.transactionType === 'CASH_TRANSFER' &&
+        transaction.targetAccountNumber === this.account?.accountNumber);
   }
 
   getTransactionTypeLabel(type: string): string {

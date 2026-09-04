@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 FROM eclipse-temurin:17-jdk AS build
 
 WORKDIR /app
@@ -9,7 +10,7 @@ RUN sed -i 's/\r$//' mvnw
 RUN chmod +x mvnw
 
 COPY src/ src/
-RUN ./mvnw clean package -DskipTests
+RUN --mount=type=cache,target=/root/.m2 ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:17-jre
 

@@ -156,3 +156,74 @@ button:disabled {
   border: 1px solid #fed7aa;
   color: #9a3412;
 }
+
+.field-note {
+  color: var(--muted);
+  font-size: 13px;
+  margin: -8px 0 0;
+}
+
+.confirmation-list {
+  border-top: 1px solid var(--line);
+  margin: 0;
+}
+
+.confirmation-list div {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: minmax(150px, 34%) 1fr;
+  min-height: 52px;
+}
+
+.confirmation-list dt,
+.confirmation-list dd {
+  margin: 0;
+  padding: 12px 14px;
+}
+
+.confirmation-list dt {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.confirmation-list dd {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.confirmation-list .transfer-amount {
+  color: var(--brand-red);
+  font-size: 20px;
+}
+
+.confirmation-actions {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 2fr;
+  margin-top: 22px;
+}
+
+.confirmation-actions button {
+  min-height: 46px;
+}
+
+.secondary-button {
+  background: #ffffff;
+  border: 1px solid #94a3b8;
+  color: #334155;
+}
+
+@media (max-width: 560px) {
+  .confirmation-list div {
+    align-items: start;
+    grid-template-columns: 1fr;
+  }
+
+  .confirmation-list dd {
+    padding-top: 0;
+  }
+}

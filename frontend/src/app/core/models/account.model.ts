@@ -29,12 +29,18 @@ export interface FundTransferRequest {
 export interface RecipientResponse {
   accountNumber: string;
   name: string;
+  bankName: string;
+  bankCode: string;
+  branch: string;
+  branchCode: string;
+  accountType: string;
 }
 
 export interface AccountResponse {
   accountNumber: string;
   balance: number;
   accountType: string;
+  bankName: string;
   bankCode: string;
   bankAddress: string;
   branch: string;

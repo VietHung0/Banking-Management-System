@@ -6,16 +6,19 @@
 </section>
 
 <section class="work-panel">
-  <article class="form-card">
+  <article class="form-card" *ngIf="!isConfirming">
     <span class="card-label">振込手続き</span>
     <h2>振込内容</h2>
 
-    <form (ngSubmit)="onSubmit()">
+    <form (ngSubmit)="reviewTransfer()">
       <label>
         振込先口座番号
         <input
           type="text"
           name="targetAccountNumber"
+          inputmode="numeric"
+          maxlength="7"
+          pattern="[0-9]{7}"
           [(ngModel)]="transferRequest.targetAccountNumber"
           (blur)="checkRecipient()"
           required
@@ -23,8 +26,8 @@
       </label>
 
       <p class="lookup-message" *ngIf="isCheckingRecipient">振込先口座を確認中...</p>
-      <p class="recipient-message" *ngIf="recipientName">
-        受取人名: <strong>{{ recipientName }}</strong>
+      <p class="recipient-message" *ngIf="recipient">
+        受取人名: <strong>{{ recipient.name }}</strong>
       </p>
       <p class="error-message" *ngIf="recipientMessage">{{ recipientMessage }}</p>
 
@@ -52,26 +55,54 @@
       </label>
 
       <label>
-        メッセージ
+        メモ（ご本人さま用）
         <textarea
           name="message"
           rows="3"
           maxlength="120"
           [(ngModel)]="transferRequest.message"
-          placeholder="例: 8月分のお支払い"
+          placeholder="例：8月分の家賃"
         ></textarea>
       </label>
+      <p class="field-note">メモは受取人には通知されません。</p>
 
       <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
       <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-      <button type="submit" [disabled]="isLoading">
-        {{ isLoading ? '処理中...' : '振込する' }}
+      <button type="submit" [disabled]="isCheckingRecipient">
+        確認画面へ
       </button>
     </form>
   </article>
 
-  <aside class="guide-card">
+  <article class="form-card confirmation-card" *ngIf="isConfirming && recipient">
+    <span class="card-label">振込内容の確認</span>
+    <h2>以下の内容で振り込みます</h2>
+
+    <dl class="confirmation-list">
+      <div><dt>金融機関名</dt><dd>{{ recipient.bankName }}</dd></div>
+      <div><dt>金融機関コード</dt><dd>{{ recipient.bankCode }}</dd></div>
+      <div><dt>支店名</dt><dd>{{ recipient.branch }}</dd></div>
+      <div><dt>支店コード</dt><dd>{{ recipient.branchCode }}</dd></div>
+      <div><dt>預金種目</dt><dd>{{ getAccountTypeLabel(recipient.accountType) }}</dd></div>
+      <div><dt>口座番号</dt><dd>{{ recipient.accountNumber }}</dd></div>
+      <div><dt>受取人名</dt><dd>{{ recipient.name }}</dd></div>
+      <div><dt>振込金額</dt><dd class="transfer-amount">{{ transferRequest.amount | number:'1.0-0' }}円</dd></div>
+      <div><dt>振込手数料</dt><dd>0円</dd></div>
+      <div><dt>メモ</dt><dd>{{ transferRequest.message || '-' }}</dd></div>
+    </dl>
+
+    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <div class="confirmation-actions">
+      <button type="button" class="secondary-button" (click)="backToEdit()" [disabled]="isLoading">戻る</button>
+      <button type="button" (click)="onSubmit()" [disabled]="isLoading">
+        {{ isLoading ? '処理中...' : '振込を確定する' }}
+      </button>
+    </div>
+  </article>
+
+  <aside class="guide-card" *ngIf="!isConfirming">
     <h2>振込時のご注意</h2>
     <p>振込前に受取人名と口座番号をご確認ください。</p>
     <p>振込は1円以上から入力できます。</p>

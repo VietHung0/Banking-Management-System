@@ -34,13 +34,15 @@ public class Account {
 
     private String accountStatus;
 
-    private double balance;
+    private long balance;
+
+    private String bankName = "ドコモSMTBネット銀行";
 
     private String bankCode = "0038";
 
-    private String bankAddress = "Tokyo";
+    private String bankAddress = "東京都港区六本木三丁目2番1号";
 
-    private String branch = "Ichigo Branch";
+    private String branch = "イチゴ支店";
 
     private String branchCode = "101";
 

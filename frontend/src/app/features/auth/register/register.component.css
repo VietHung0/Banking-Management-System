@@ -18,14 +18,14 @@
 .brand-mark {
   align-items: center;
   background: var(--brand-red);
-  border-radius: 8px;
+  border-radius: 6px;
   color: #ffffff;
   display: flex;
-  font-size: 24px;
-  font-weight: 700;
-  height: 48px;
+  font-size: 20px;
+  font-weight: 800;
+  height: 40px;
   justify-content: center;
-  width: 48px;
+  width: 40px;
 }
 
 .brand div strong,

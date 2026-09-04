@@ -1,4 +1,4 @@
-import { CurrencyPipe, NgIf } from '@angular/common';
+import { DecimalPipe, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 
 import { AccountResponse } from '../../../core/models/account.model';
@@ -7,7 +7,7 @@ import { DashboardService } from '../../../core/services/dashboard.service';
 @Component({
   selector: 'app-account-info',
   standalone: true,
-  imports: [CurrencyPipe, NgIf],
+  imports: [DecimalPipe, NgIf],
   templateUrl: './account-info.component.html',
   styleUrl: './account-info.component.css'
 })
@@ -41,19 +41,6 @@ export class AccountInfoComponent {
         return '普通預金';
       default:
         return accountType || '-';
-    }
-  }
-
-  getAccountStatusLabel(accountStatus?: string): string {
-    switch (accountStatus) {
-      case 'ACTIVE':
-      case 'Active':
-        return '利用中';
-      case 'INACTIVE':
-      case 'Inactive':
-        return '停止中';
-      default:
-        return accountStatus || '-';
     }
   }
 }

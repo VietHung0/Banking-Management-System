@@ -7,7 +7,7 @@
       <div>
         <p class="welcome">{{ user?.name }} さま</p>
         <span class="eyebrow">代表口座</span>
-        <h1>{{ account?.balance | currency:'JPY':'symbol':'1.0-0' }}</h1>
+        <h1>{{ account?.balance | number:'1.0-0' }}円</h1>
         <p>ご利用可能残高</p>
       </div>
 
@@ -20,27 +20,27 @@
 
   <section class="quick-actions">
     <a routerLink="/account">
-      <span>A</span>
+      <span><i class="fas fa-address-card" aria-hidden="true"></i></span>
       口座
     </a>
     <a routerLink="/account/deposit">
-      <span>D</span>
+      <span><i class="fas fa-money-bill-wave" aria-hidden="true"></i></span>
       入金
     </a>
     <a routerLink="/account/withdraw">
-      <span>W</span>
+      <span><i class="fas fa-money-bill" aria-hidden="true"></i></span>
       出金
     </a>
     <a routerLink="/account/fund-transfer">
-      <span>T</span>
+      <span><i class="fas fa-exchange-alt" aria-hidden="true"></i></span>
       振込
     </a>
     <a routerLink="/account/pin">
-      <span>P</span>
+      <span><i class="fas fa-key" aria-hidden="true"></i></span>
       暗証番号
     </a>
     <a routerLink="/account/transactions">
-      <span>H</span>
+      <span><i class="fas fa-history" aria-hidden="true"></i></span>
       明細
     </a>
   </section>
@@ -62,15 +62,15 @@
       <div class="cashflow-summary">
         <div>
           <span>入金</span>
-          <strong>{{ moneyIn | currency:'JPY':'symbol':'1.0-0' }}</strong>
+          <strong>{{ moneyIn | number:'1.0-0' }}円</strong>
         </div>
         <div>
           <span>出金</span>
-          <strong>{{ moneyOut | currency:'JPY':'symbol':'1.0-0' }}</strong>
+          <strong>{{ moneyOut | number:'1.0-0' }}円</strong>
         </div>
         <div>
           <span>差引</span>
-          <strong [class.negative]="netChange < 0">{{ netChange | currency:'JPY':'symbol':'1.0-0' }}</strong>
+          <strong [class.negative]="netChange < 0">{{ netChange | number:'1.0-0' }}円</strong>
         </div>
       </div>
 
@@ -85,14 +85,14 @@
               <div class="flow-track">
                 <span class="flow-fill in" [style.width.%]="row.inPercent"></span>
               </div>
-              <strong>{{ row.moneyIn | currency:'JPY':'symbol':'1.0-0' }}</strong>
+              <strong>{{ row.moneyIn | number:'1.0-0' }}円</strong>
             </div>
             <div class="flow-line">
               <span class="flow-label">出金</span>
               <div class="flow-track">
                 <span class="flow-fill out" [style.width.%]="row.outPercent"></span>
               </div>
-              <strong>{{ row.moneyOut | currency:'JPY':'symbol':'1.0-0' }}</strong>
+              <strong>{{ row.moneyOut | number:'1.0-0' }}円</strong>
             </div>
           </div>
         </div>
@@ -116,7 +116,7 @@
             <strong>{{ getTransactionTypeLabel(transaction.transactionType) }}</strong>
             <span>{{ transaction.transactionDate | date: 'yyyy/MM/dd HH:mm' }}</span>
           </div>
-          <strong class="amount">{{ transaction.amount | currency:'JPY':'symbol':'1.0-0' }}</strong>
+          <strong class="amount">{{ transaction.amount | number:'1.0-0' }}円</strong>
         </div>
       </div>
     </article>

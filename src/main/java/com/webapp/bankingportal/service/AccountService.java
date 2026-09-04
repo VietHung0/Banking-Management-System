@@ -14,11 +14,11 @@ public interface AccountService {
 
     void updatePin(String accountNumber, String oldPin, String password, String newPin);
 
-    void cashDeposit(String accountNumber, String pin, double amount);
+    void cashDeposit(String accountNumber, String pin, long amount);
 
-    void cashWithdrawal(String accountNumber, String pin, double amount);
+    void cashWithdrawal(String accountNumber, String pin, long amount);
 
-    void fundTransfer(String sourceAccountNumber, String targetAccountNumber, String pin, double amount, String message);
+    void fundTransfer(String sourceAccountNumber, String targetAccountNumber, String pin, long amount, String message);
 
     RecipientResponse getRecipient(String accountNumber);
 }

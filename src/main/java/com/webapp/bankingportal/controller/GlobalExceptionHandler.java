@@ -5,6 +5,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import com.webapp.bankingportal.exception.AccountNotFoundException;
 import com.webapp.bankingportal.exception.InvalidPinException;
@@ -25,6 +26,11 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElse("入力内容が正しくありません");
         return ResponseEntity.badRequest().body(message);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> handleUnreadableRequest(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest().body("入力内容の形式が正しくありません");
     }
 
     @ExceptionHandler(Exception.class)

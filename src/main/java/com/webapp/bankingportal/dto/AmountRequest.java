@@ -6,5 +6,5 @@ import jakarta.validation.constraints.Positive;
 public record AmountRequest(
         @NotBlank String pin,
         @Positive(message = "金額は1円以上で入力してください")
-        double amount) {
+        long amount) {
 }

@@ -24,7 +24,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
               and t.transactionDate >= :startDate
               and t.transactionDate < :endDate
             """)
-    double sumAmountBySourceAccountAndTypeBetween(
+    long sumAmountBySourceAccountAndTypeBetween(
             @Param("accountNumber") String accountNumber,
             @Param("transactionType") TransactionType transactionType,
             @Param("startDate") java.util.Date startDate,

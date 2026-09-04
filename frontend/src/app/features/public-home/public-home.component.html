@@ -1,0 +1,113 @@
+<div class="public-page">
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" routerLink="/" aria-label="ネット銀行デモ ホーム">
+        <span class="brand-mark">N</span>
+        <span class="brand-name">
+          <strong>ネット銀行デモ</strong>
+          <small>NET BANK DEMO</small>
+        </span>
+      </a>
+
+      <nav class="global-nav" aria-label="メインメニュー">
+        <a href="#services">商品・サービス</a>
+        <a href="#security">セキュリティ</a>
+        <a href="#support">サポート</a>
+      </nav>
+
+      <div class="header-actions">
+        <a class="login-link" routerLink="/login">
+          <i class="fas fa-lock" aria-hidden="true"></i>
+          ログイン
+        </a>
+        <a class="register-link" routerLink="/register">口座開設</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-inner">
+        <p class="hero-label">いつもの毎日に、安心できる銀行を。</p>
+        <h1>お金を、もっと身近に。<br>もっと自由に。</h1>
+        <p class="hero-copy">口座管理から振込、入出金明細の確認まで。<br>シンプルで使いやすいネットバンキングです。</p>
+        <div class="hero-actions">
+          <a class="primary-action" routerLink="/register">口座を開設する</a>
+          <a class="text-action" routerLink="/login">すでに口座をお持ちの方 <i class="fas fa-chevron-right" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="quick-menu" aria-label="クイックメニュー">
+      <div class="quick-menu-inner">
+        <a routerLink="/login">
+          <i class="fas fa-coins" aria-hidden="true"></i>
+          <span><strong>残高照会</strong><small>現在の残高を確認</small></span>
+        </a>
+        <a routerLink="/login">
+          <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+          <span><strong>振込</strong><small>かんたん・スムーズ</small></span>
+        </a>
+        <a routerLink="/login">
+          <i class="fas fa-list-alt" aria-hidden="true"></i>
+          <span><strong>入出金明細</strong><small>お取引を確認</small></span>
+        </a>
+        <a href="#support">
+          <i class="fas fa-question-circle" aria-hidden="true"></i>
+          <span><strong>お困りの方</strong><small>サポート情報</small></span>
+        </a>
+      </div>
+    </section>
+
+    <section class="notice-band">
+      <div class="section-inner notice-inner">
+        <h2>重要なお知らせ</h2>
+        <p><time datetime="2026-09-04">2026年9月4日</time><span>デモサービスをご利用いただきありがとうございます。</span></p>
+      </div>
+    </section>
+
+    <section class="services" id="services">
+      <div class="section-inner">
+        <p class="section-label">SERVICES</p>
+        <h2>便利な銀行サービス</h2>
+        <div class="service-grid">
+          <article>
+            <i class="fas fa-wallet" aria-hidden="true"></i>
+            <h3>口座管理</h3>
+            <p>残高や口座情報を、いつでも分かりやすく確認できます。</p>
+          </article>
+          <article>
+            <i class="fas fa-paper-plane" aria-hidden="true"></i>
+            <h3>振込・入出金</h3>
+            <p>毎日の資金移動を、シンプルな操作で利用できます。</p>
+          </article>
+          <article>
+            <i class="fas fa-chart-line" aria-hidden="true"></i>
+            <h3>利用状況の確認</h3>
+            <p>入出金明細とグラフから、お金の動きを把握できます。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="security-band" id="security">
+      <div class="section-inner security-inner">
+        <span class="security-icon"><i class="fas fa-shield-alt" aria-hidden="true"></i></span>
+        <div>
+          <p class="section-label">SECURITY</p>
+          <h2>安心してご利用いただくために</h2>
+          <p>認証トークンと暗証番号によって、お客さまの大切な口座情報を保護します。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="support">
+    <div class="section-inner footer-inner">
+      <div class="footer-brand"><span class="brand-mark">N</span><strong>ネット銀行デモ</strong></div>
+      <div class="footer-links"><a routerLink="/login">ログイン</a><a routerLink="/register">口座開設</a></div>
+      <p>金融機関コード：0038</p>
+    </div>
+    <div class="copyright">© 2026 Net Bank Demo. Portfolio project.</div>
+  </footer>
+</div>

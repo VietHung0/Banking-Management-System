@@ -4,6 +4,7 @@ import java.util.Date;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -13,11 +14,14 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "banking-management-system-secret-key-for-jwt-token";
     private static final long EXPIRATION_TIME = 1000 * 60 * 60;
+    private final Key signingKey;
 
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+    public JwtUtil(@Value("${app.jwt.secret}") String secretKey) {
+        if (secretKey == null || secretKey.length() < 32) {
+            throw new IllegalArgumentException("JWT_SECRET must contain at least 32 characters");
+        }
+        this.signingKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(String accountNumber) {
@@ -25,13 +29,13 @@ public class JwtUtil {
                 .setSubject(accountNumber)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(signingKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

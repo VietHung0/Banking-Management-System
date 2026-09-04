@@ -5,6 +5,7 @@ export interface UserResponse {
   phoneNumber: string;
   address: string;
   accountNumber: string;
+  bankName: string;
   bankCode: string;
   bankAddress: string;
   branchCode: string;

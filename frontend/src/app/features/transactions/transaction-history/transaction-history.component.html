@@ -45,7 +45,7 @@
         <th>金額</th>
         <th>出金口座</th>
         <th>入金口座</th>
-        <th>メッセージ</th>
+        <th>メモ</th>
         <th>取引日時</th>
       </tr>
     </thead>
@@ -54,7 +54,7 @@
         <td>
           <span class="type-badge">{{ getTransactionTypeLabel(transaction.transactionType) }}</span>
         </td>
-        <td class="amount">{{ transaction.amount | currency:'JPY':'symbol':'1.0-0' }}</td>
+        <td class="amount">{{ transaction.amount | number:'1.0-0' }}円</td>
         <td>{{ transaction.sourceAccountNumber }}</td>
         <td>{{ transaction.targetAccountNumber }}</td>
         <td>{{ transaction.message || '-' }}</td>

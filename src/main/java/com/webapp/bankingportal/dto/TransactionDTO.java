@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TransactionDTO {
     private Long id;
-    private double amount;
+    private long amount;
     private TransactionType transactionType;
     private Date transactionDate;
     private String sourceAccountNumber;
@@ -32,6 +32,13 @@ public class TransactionDTO {
             this.targetAccountNumber = transaction.getTargetAccount().getAccountNumber();
         } else {
             this.targetAccountNumber = "-";
+        }
+    }
+
+    public TransactionDTO(Transaction transaction, String requestingAccountNumber) {
+        this(transaction);
+        if (!transaction.getSourceAccount().getAccountNumber().equals(requestingAccountNumber)) {
+            this.message = null;
         }
     }
 

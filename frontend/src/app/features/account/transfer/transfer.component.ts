@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { DecimalPipe, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { FundTransferRequest } from '../../../core/models/account.model';
+import { FundTransferRequest, RecipientResponse } from '../../../core/models/account.model';
 import { AccountService } from '../../../core/services/account.service';
 
 @Component({
   selector: 'app-transfer',
   standalone: true,
-  imports: [FormsModule, NgIf],
+  imports: [DecimalPipe, FormsModule, NgIf],
   templateUrl: './transfer.component.html',
   styleUrl: './transfer.component.css'
 })
@@ -22,17 +22,19 @@ export class TransferComponent {
 
   successMessage = '';
   errorMessage = '';
-  recipientName = '';
+  recipient?: RecipientResponse;
   recipientMessage = '';
   isLoading = false;
   isCheckingRecipient = false;
+  isConfirming = false;
 
   constructor(private accountService: AccountService) {}
 
   checkRecipient(): void {
     const accountNumber = this.transferRequest.targetAccountNumber.trim();
-    this.recipientName = '';
+    this.recipient = undefined;
     this.recipientMessage = '';
+    this.isConfirming = false;
 
     if (!accountNumber) {
       return;
@@ -43,7 +45,7 @@ export class TransferComponent {
     this.accountService.getRecipient(accountNumber).subscribe({
       next: (recipient) => {
         this.isCheckingRecipient = false;
-        this.recipientName = recipient.name;
+        this.recipient = recipient;
       },
       error: () => {
         this.isCheckingRecipient = false;
@@ -52,37 +54,57 @@ export class TransferComponent {
     });
   }
 
-  onSubmit(): void {
-    if (this.isLoading) {
-      return;
-    }
-
+  reviewTransfer(): void {
     this.successMessage = '';
     this.errorMessage = '';
     this.transferRequest.targetAccountNumber = this.transferRequest.targetAccountNumber.trim();
+
+    if (!this.recipient || this.recipient.accountNumber !== this.transferRequest.targetAccountNumber) {
+      this.errorMessage = '振込先口座を確認してください。';
+      return;
+    }
 
     if (!this.isValidTransferAmount()) {
       this.errorMessage = '振込は1円以上、1,000,000円以下で入力してください。';
       return;
     }
 
+    if (!this.transferRequest.pin.trim()) {
+      this.errorMessage = '暗証番号を入力してください。';
+      return;
+    }
+
+    this.isConfirming = true;
+  }
+
+  backToEdit(): void {
+    this.isConfirming = false;
+    this.errorMessage = '';
+  }
+
+  onSubmit(): void {
+    if (this.isLoading || !this.isConfirming || !this.recipient) {
+      return;
+    }
+
+    this.successMessage = '';
+    this.errorMessage = '';
     this.isLoading = true;
     const idempotencyKey = this.accountService.createIdempotencyKey();
 
     this.accountService.transfer(this.transferRequest, idempotencyKey).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.successMessage = this.recipientName
-          ? `${this.recipientName} さまへの振込が完了しました。`
-          : '振込が完了しました。';
+        this.successMessage = `${this.recipient?.name} さまへの振込が完了しました。`;
         this.transferRequest = {
           targetAccountNumber: '',
           pin: '',
           amount: 0,
           message: ''
         };
-        this.recipientName = '';
+        this.recipient = undefined;
         this.recipientMessage = '';
+        this.isConfirming = false;
       },
       error: () => {
         this.isLoading = false;
@@ -94,5 +116,11 @@ export class TransferComponent {
   private isValidTransferAmount(): boolean {
     const amount = this.transferRequest.amount;
     return amount >= 1 && amount <= 1000000 && amount % 1 === 0;
+  }
+
+  getAccountTypeLabel(accountType: string): string {
+    return accountType === 'Ordinary Deposit' || accountType === 'Savings'
+      ? '普通預金'
+      : accountType;
   }
 }

@@ -16,8 +16,9 @@
 body {
   background: var(--page);
   color: var(--ink);
-  font-family: "Segoe UI", "Yu Gothic", "Meiryo", Arial, Helvetica, sans-serif;
-  line-height: 1.5;
+  font-family: "Hiragino Sans", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "Noto Sans JP", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
   margin: 0;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;

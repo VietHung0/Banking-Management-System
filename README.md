@@ -24,7 +24,7 @@
 ## ✨ Key Features & Feature Showcase
 
 ### 1. 🔑 Secure Authentication & User Onboarding
-* **JWT Authentication**: Stateless, token-based authentication with auto-refresh interceptors.
+* **JWT Authentication**: Stateless authentication with expiry checks, revocation, and automatic return to login when a session is invalid.
 * **Dual Login Options**: Log in using registered email address or assigned account number.
 * **Registration & Profile**: Account creation with automatic account number generation.
 
@@ -49,7 +49,8 @@
 ### 3. 💸 Fund Transfer (振込)
 * **Instant Transfers**: Send funds directly to another bank account number.
 * **PIN Verification**: Enhanced security layer requiring transaction PIN before execution.
-* **Transfer Memos**: Option to append notes/memos for recipient transaction tracking.
+* **Transfer Confirmation**: Review bank, branch, account, recipient, amount, and fee before sending.
+* **Personal Memos**: Save an optional private memo for your own transaction tracking.
 
 <p align="center">
   <img src="docs/images/transfer.png" alt="Fund Transfer" width="850" />
@@ -99,8 +100,8 @@
 * **Architecture**: Layered Architecture (Controller -> Service -> Repository -> Entity)
 
 ### Frontend
-* **Framework**: Angular 18 (Standalone Components, RxJS, Signals)
-* **Styling**: Modern CSS, Responsive Layout, Glassmorphism & Custom Design System
+* **Framework**: Angular 18 (Standalone Components and RxJS)
+* **Styling**: Modern CSS, responsive layout, and a custom design system
 * **HTTP & Security**: Angular Functional Guards, HTTP Interceptors for JWT Injection
 
 ### Infrastructure & DevOps
@@ -116,10 +117,13 @@
 
 ### 1. Clone & Run
 
-```bash
+```powershell
 # Clone the repository
 git clone https://github.com/VietHung0/Banking-Management-System.git
 cd Banking-Management-System
+
+# Create the local environment file, then replace JWT_SECRET with a random value of at least 32 characters
+Copy-Item .env.example .env
 
 # Start all services with Docker Compose
 docker compose up --build -d
